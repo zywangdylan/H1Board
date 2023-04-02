@@ -1,4 +1,7 @@
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
 /.pnp
 .pnp.js
 
@@ -18,3 +21,5 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+/credentials.json
