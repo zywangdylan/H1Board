@@ -2,6 +2,19 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## File Structure
+- src: This folder typically contains all the source code for the project.
+    - components: This folder contains all the reusable UI components used in the project.
+    - pages: This folder contains all the main pages/views of the project.
+    - assets: This folder contains all the static assets used in the project, such as images, fonts, and stylesheets.
+    - helpers: This folder contains all the utility functions and modules used throughout the project.
+    - services: This folder contains all the services and API clients used to fetch data from a backend server.
+    - App.js: This file is the main entry point for the React application, containing the root component and routing configuration.
+    - index.js: This file is the entry point for the entire project, importing and rendering the main React application.
+- public: This folder contains all the static assets that are publicly accessible, such as the index.html file and favicon.ico.
+- package.json: This file contains metadata about the project and its dependencies, as well as scripts for building, testing, and running the project.
+- package-lock.json: This file is generated automatically by npm to lock down the exact versions of dependencies installed in the project.
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -44,22 +57,6 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
 ### Deployment
 
