@@ -1,27 +1,33 @@
+// backend server
+
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
 const routes = require('./routes');
 
-const app = express();
-app.use(cors({
-  origin: '*',
-}));
+const webapp = express();
+webapp.use(cors({origin: '*',}));
+// accept command line and json inputs
+webapp.use(express.urlencoded({ extended: true }));
+webapp.use(express.json());
 
 // We use express to define our various API endpoints and
 // provide their handlers that we implemented in routes.js
-app.get('/author/:type', routes.author);
-app.get('/random', routes.random);
-app.get('/song/:song_id', routes.song);
-app.get('/album/:album_id', routes.album);
-app.get('/albums', routes.albums);
-app.get('/album_songs/:album_id', routes.album_songs);
-app.get('/top_songs', routes.top_songs);
-app.get('/top_albums', routes.top_albums);
-app.get('/search_songs', routes.search_songs);
+webapp.get('/', routes.welcome);
+webapp.get('/user/:id', routes.getOneUser);
+webapp.post('/user', routes.createOneUser);
+webapp.get('/popularCompanies', routes.getPopularCompanies);
+webapp.get('/highReviewCompanies/review', routes.getHRC_Review);
+webapp.get('/highReviewCompanies/empSize', routes.getHRC_empSize);
+webapp.get('/highReviewCompanies/caseAndReviewCount', routes.getHRC_caseAndReviewCount);
+webapp.get('/highReviewCompanies/workLifeBalance', routes.getHRC_workLifeBal);
+webapp.get('/highReviewCompanies/:numCompanies/:numLocations', routes.getHRC_numCompanyAndLocate);
+webapp.get('/highReviewCompanies/companySizeAndCaseStatus/:numLocation', routes.getHRC_locateAndH1B);
+webapp.get('/highReviewCompanies/:isFulltime', routes.getHRC_fullTimeAndH1B);
+webapp.get('/highReviewCompanies/:numIndustries', routes.getHRC_industry);
 
-app.listen(config.server_port, () => {
+webapp.listen(config.server_port, () => {
   console.log(`Server running at http://${config.server_host}:${config.server_port}/`)
 });
 
-module.exports = app;
+module.exports = webapp;
