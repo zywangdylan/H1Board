@@ -32,9 +32,12 @@ const getOneUser = async function(req, res) {
   WHERE userId = ${id}
   `
   connection.query(query, (err, data) => {
-    if (err || data.length === 0) {
+    if (err) { 
       console.log(err);
       res.json({});
+    } else if (data.length === 0) {
+      console.log("User id ", String(id), " does not exist.");
+      res.status(404).send('User id does not exist.');
     } else {
       res.json(data);
     }
@@ -79,37 +82,28 @@ const createOneUser = async function(req, res) {
 
 // Route 3: GET /popularCompanies
 const getPopularCompanies = async function(req, res) {
-  // const song_id = req.params.song_id;
-  // connection.query(`SELECT * FROM Songs WHERE song_id='${song_id}'`, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data[0]);
-  //   }
-  // });
-}
+  // Retrieve castStatus, wageFrom, and industry from query params
+  const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
+  const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0.0;
+  const industry = req.query.industry ? req.query.industry : '';
 
-// Route 4: GET /highReviewCompanies/review
-const getHRC_Review = async function(req, res) {
-  // // TODO (TASK 5): implement a route that given a album_id, returns all information about the album
-  // const album_id = req.params.album_id;
-  // connection.query(`SELECT album_id, title, release_date, thumbnail_url FROM Albums WHERE album_id='${album_id}'`, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data[0]);
-  //   }
-  // });
-}
+  const query 
+    = `SELECT 
+          c.name AS company_name, 
+          h.jobTitle, 
+          h.submitDate, 
+          i.industry 
+      FROM Company c
+        INNER JOIN H1bCase h ON c.companyId = h.companyId
+        INNER JOIN Industry i ON c.industryId = i.industryId 
+      WHERE ('${caseStatus}' = '' OR h.caseStatus = '${caseStatus}') 
+            AND h.wageFrom >= ${wageFrom} 
+            AND ('${industry}' = '' OR i.industry = '${industry}') 
+      LIMIT 100;
+  `;
 
-// Route 5: GET /highReviewCompanies/empSize
-const getHRC_empSize = async function(req, res) {
-  // TODO (TASK 6): implement a route that returns all albums ordered by release date (descending)
-  // Note that in this case you will need to return multiple albums, so you will need to return an array of objects
-  connection.query(`SELECT album_id, title, release_date, thumbnail_url FROM Albums ORDER BY release_date DESC`, (err, data) => {
-    if (err || data.length === 0) {
+  connection.query(query, (err, data) => {
+    if (err) { 
       console.log(err);
       res.json({});
     } else {
@@ -118,156 +112,424 @@ const getHRC_empSize = async function(req, res) {
   });
 }
 
-// Route 6: GET /highReviewCompanies/caseAndReviewCount
-const getHRC_caseAndReviewCount = async function(req, res) {
-  // // TODO (TASK 7): implement a route that given an album_id, returns all songs on that album ordered by track number (ascending)
-  // const album_id = req.params.album_id;
-  // connection.query(`SELECT song_id, title, number, duration, plays FROM Songs WHERE album_id='${album_id}' ORDER BY number ASC`, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data);
-  //   }
-  // });
+// Route 4: GET /companies/review, obtain company name and review with certain number of reviews and range of rating. 
+// Ordered in avg rating descending order
+const getHRC_Review = async function(req, res) {
+  // Retrieve castStatus, wageFrom, and industry from parameters
+  const reviewNum = req.query.reviewNum ? req.query.reviewNum : 0;
+  const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
+  const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100.0;
+
+  const query 
+    = `WITH 
+        company_review_stats AS (
+          SELECT 
+            companyId, 
+            COUNT(*) AS num_reviews, 
+            AVG(overallRating) AS avg_rating
+          FROM Review
+          GROUP BY companyId 
+          HAVING COUNT(*) >= ${reviewNum} 
+                 AND AVG(overallRating) >= ${ratingFloor} 
+                 AND AVG(overallRating) <= ${ratingCeiling}) 
+      SELECT 
+        Company.name, 
+        company_review_stats.num_reviews, 
+        company_review_stats.avg_rating
+      FROM Company
+      JOIN company_review_stats ON Company.companyId = company_review_stats.companyId
+      ORDER BY company_review_stats.avg_rating DESC;
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 }
 
-// Route 7: GET /highReviewCompanies/workLifeBalance
+// TODO: optimize slow query 5
+// Route 5: GET /companies/empSize
+const getHRC_empSize = async function(req, res) {
+  // Retrieve castStatus, wageFrom, and industry from parameters
+  const empSize = req.query.empSize ? req.query.empSize : 400;
+  const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
+  const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100.0;
+
+  const query 
+    = `WITH 
+        company_reviews AS (
+          SELECT 
+            companyId, 
+            AVG(overallRating) AS avg_rating,
+            COUNT(*) AS num_reviews 
+          FROM Review
+          GROUP BY companyId
+          HAVING AVG(overallRating) >= ${ratingFloor} 
+          AND AVG(overallRating) <= ${ratingCeiling}), 
+        company_locations AS (
+          SELECT 
+            companyId,
+            COUNT(DISTINCT locationId) AS num_locations 
+          FROM HasRole
+          GROUP BY companyId), 
+        company_jobs AS (
+          SELECT 
+            companyId,
+            COUNT(DISTINCT jobId) AS num_jobs 
+          FROM HasRole
+          GROUP BY companyId) 
+        SELECT 
+          Company.name AS company_name,
+          Industry.industry, 
+          company_reviews.avg_rating, 
+          company_reviews.num_reviews, 
+          company_locations.num_locations, 
+          company_jobs.num_jobs
+        FROM Company
+        JOIN Industry ON Company.industryId = Industry.industryId
+        JOIN company_reviews ON Company.companyId = company_reviews.companyId 
+        JOIN company_locations ON Company.companyId = company_locations.companyId 
+        JOIN company_jobs ON Company.companyId = company_jobs.companyId
+        WHERE Company.employeeSize >= ${empSize}
+        ORDER BY company_reviews.avg_rating DESC, company_reviews.num_reviews DESC;
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// TODO: optimize slow query 6
+// Route 6: GET /companies/h1bAndInterview
+const getHRC_h1bAndInterview = async function(req, res) {
+  const numInterviewReviews = req.query.numInterviewReviews ? req.query.numInterviewReviews : 0;
+  const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
+
+  const query 
+    = `WITH 
+        company_id as (
+          SELECT 
+            IR.companyId 
+          FROM InterviewReview IR
+          WHERE IR.difficulty IS NOT NULL
+          GROUP BY IR.companyId
+          HAVING COUNT(IR.companyId) > ${numInterviewReviews}),
+        companies as (
+          SELECT * FROM Company
+          WHERE companyId IN (SELECT * FROM company_id))
+        SELECT 
+          DISTINCT C.name, 
+          H.jobId, 
+          J.title
+        FROM companies C
+        JOIN (SELECT * FROM H1bCase 
+              WHERE ('${caseStatus}' = '' OR caseStatus = '${caseStatus}')) H ON C.companyId = H.companyId 
+        JOIN Job J ON H.jobId = J.jobId
+        ORDER BY C.companyId ASC;
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// Query 8
+// Route 7: GET /companies/workLifeBalance
 const getHRC_workLifeBal = async function(req, res) {
-  // const page = req.query.page;
-  // // TODO (TASK 8): use the ternary (or nullish) operator to set the pageSize based on the query or default to 10
-  // const pageSize = req.query.page_size ? req.query.page_size : 10;
+  const yearFloor = req.query.yearFloor ? req.query.yearFloor : 0;
+  const yearCeiling = req.query.yearCeiling ? req.query.yearCeiling : 2025;
+  const avfWlbRatingFloor = req.query.avfWlbRatingFloor ? req.query.avfWlbRatingFloor : 0;
 
-  // if (!page) {
-  //   // TODO (TASK 9)): query the database and return all songs ordered by number of plays (descending)
-  //   // Hint: you will need to use a JOIN to get the album title as well
-  //   const query = `
-  //   SELECT Songs.song_id AS song_id, Songs.title AS title, Albums.album_id AS album_id, Albums.title AS album, Songs.plays AS plays
-  //     FROM Songs
-  //     JOIN Albums ON Songs.album_id = Albums.album_id
-  //     ORDER BY plays DESC
-  //   `;
-  //   connection.query(query, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json({});
-  //     } else {
-  //       res.json(data);
-  //     }
-  //   });
-  // } else {
-  //   // TODO (TASK 10): reimplement TASK 9 with pagination
-  //   // Hint: use LIMIT and OFFSET (see https://www.w3schools.com/php/php_mysql_select_limit.asp)
-  //   const query = `
-  //     SELECT Songs.song_id AS song_id, Songs.title AS title, Albums.album_id AS album_id, Albums.title AS album, Songs.plays AS plays
-  //     FROM Songs
-  //     JOIN Albums ON Songs.album_id = Albums.album_id
-  //     ORDER BY plays DESC
-  //     LIMIT ${pageSize}
-  //     OFFSET ${(page - 1) * pageSize}
-  //   `;
-  //   connection.query(query, (err, data) => {
-  //     if (err || data.length === 0) {
-  //       console.log(err);
-  //       res.json({});
-  //     } else {
-  //       res.json(data);
-  //     }
-  //   });
-  // }
+  const query 
+    = `With 
+        wlf_review AS (
+          SELECT 
+            companyId, 
+            AVG(workLifeBalance) AS workLifeBalance 
+          FROM Review
+          GROUP BY companyId
+          HAVING AVG(workLifeBalance) >= ${avfWlbRatingFloor}), 
+        companies_h1b_approve AS (
+          SELECT 
+            DISTINCT c.companyId, 
+            c.name
+          FROM Company c
+          INNER JOIN H1bCase h ON c.companyId = h.companyId
+          WHERE h.caseStatus = 'C'
+          AND h.caseYear BETWEEN ${yearFloor} AND ${yearCeiling})
+          
+      SELECT 
+        W.companyId, 
+        C.name AS companyName, 
+        W.workLifeBalance 
+      FROM wlf_review W
+      INNER JOIN companies_h1b_approve C ON W.companyId = C.companyId 
+      ORDER BY W.workLifeBalance DESC;
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 }
 
-// Route 8: GET /highReviewCompanies/reviewRatingAndCaseStatus
-const getHRC_reviewRateCaseStatus = async function(req, res) {
-  // // TODO (TASK 11): return the top albums ordered by aggregate number of plays of all songs on the album (descending), with optional pagination (as in route 7)
-  // // Hint: you will need to use a JOIN and aggregation to get the total plays of songs in an album
-  // const page = req.query.page;
-  // const pageSize = req.query.page_size ? req.query.page_size : 10;
+// Route 8: GET /companies/ratingAndCaseStatus, query 10
+const getHRC_ratingAndCaseStatus = async function(req, res) {
+  const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0;
+  const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100;
+  const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
 
-  // let query = `
-  //   SELECT Albums.album_id AS album_id, Albums.title AS title, SUM(Songs.plays) AS plays
-  //   FROM Albums
-  //   JOIN Songs ON Albums.album_id = Songs.album_id
-  //   GROUP BY Albums.album_id
-  //   ORDER BY plays DESC
-  // `;
+  const query 
+    = `WITH 
+        company_rateLess3 AS (
+          SELECT 
+            companyId, 
+            AVG(overallRating) AS avg_rating 
+          FROM Review
+          GROUP BY companyId
+          HAVING AVG(overallRating) <= ${ratingCeiling}
+          AND AVG(overallRating) >= ${ratingFloor}) 
+      SELECT 
+        DISTINCT C.name, 
+        CRL.avg_rating, 
+        I.industry
+      FROM Company C
+      INNER JOIN company_rateLess3 CRL ON C.companyId = CRL.companyId 
+      INNER JOIN (
+        SELECT companyId FROM H1bCase 
+        WHERE (caseStatus = '${caseStatus}' OR '${caseStatus}' = '')) H 
+      ON C.companyId = H.companyId
+      INNER JOIN Industry I ON C.industryId = I.industryId
+      ORDER BY CRL.avg_rating DESC;
+  `;
 
-  // if (page) {
-  //   query = `
-  //     SELECT Albums.album_id, Albums.title, SUM(Songs.plays) AS plays
-  //     FROM Albums
-  //     JOIN Songs ON Albums.album_id = Songs.album_id
-  //     GROUP BY Albums.album_id
-  //     ORDER BY plays DESC
-  //     LIMIT ${pageSize}
-  //     OFFSET ${(page - 1) * pageSize}
-  //   `;
-  // }
-  // connection.query(query, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data);
-  //   }
-  // });
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 }
 
-// Route 9: /highReviewCompanies/:numCompanies/:numLocations
-const getHRC_numCompanyAndLocate = async function(req, res) {
-  // // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
-  // // Some default parameters have been provided for you, but you will need to fill in the rest
-  // const title = req.query.title ?? '';
-  // const durationLow = req.query.duration_low ?? 60;
-  // const durationHigh = req.query.duration_high ?? 660;
-  // const playsLow = req.query.plays_low ?? 0;
-  // const playsHigh = req.query.plays_high ?? 1100000000;
-  // const danceabilityLow = req.query.danceability_low ?? 0;
-  // const danceabilityHigh = req.query.danceability_high ?? 1;
-  // const energyLow = req.query.energy_low ?? 0;
-  // const energyHigh = req.query.energy_high ?? 1;
-  // const valenceLow = req.query.valence_low ?? 0;
-  // const valenceHigh = req.query.valence_high ?? 1;
-  // const explicit = req.query.explicit === 'true' ? 1 : 0;
+// Route 9: /companies/locationAndFulltime
+// List the places with the most companies (of a certain scale) offering fulltime jobs.
+const getHRC_locationAndFulltime = async function(req, res) {
+  const numCompanies = req.query.numCompanies ? req.query.numCompanies : 50;
+  const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
-  // const query = `
-  //   SELECT * FROM Songs
-  //   WHERE title LIKE '%${title}%'
-  //   AND duration BETWEEN ${durationLow} AND ${durationHigh}
-  //   AND plays BETWEEN ${playsLow} AND ${playsHigh}
-  //   AND danceability BETWEEN ${danceabilityLow} AND ${danceabilityHigh}
-  //   AND energy BETWEEN ${energyLow} AND ${energyHigh}
-  //   AND valence BETWEEN ${valenceLow} AND ${valenceHigh}
-  //   AND explicit <= ${explicit}
-  //   Order By title ASC
-  // `;
+  const query 
+    = `WITH 
+        fulltime_jobs AS (
+          SELECT 
+            companyId, 
+            COUNT(*) AS num_jobs 
+          FROM HasRole
+          JOIN Job ON HasRole.jobId = Job.jobId 
+          WHERE fulltime = 1
+          GROUP BY companyId),
 
-  // connection.query(query, (err, data) => {
-  //   if (err || data.length === 0) {
-  //     console.log(err);
-  //     res.json({});
-  //   } else {
-  //     res.json(data);
-  //   }
-  // });
+          top_companies AS (
+            SELECT 
+              companyId, 
+              name, 
+              employeeSize, 
+              industry
+            FROM Company
+            WHERE companyId IN (SELECT companyId FROM fulltime_jobs) 
+            ORDER BY employeeSize DESC
+            LIMIT ${numCompanies}),
+
+          top_locations AS (
+            SELECT 
+              locationId, 
+              city, 
+              state 
+            FROM Location
+            WHERE locationId IN (
+              SELECT locationId FROM HasRole 
+              WHERE companyId IN (
+                SELECT companyId FROM top_companies))),
+   
+          location_counts AS (
+            SELECT city, state, COUNT(*) AS num_companies FROM top_locations
+            JOIN HasRole ON top_locations.locationId = HasRole.locationId 
+            JOIN top_companies ON HasRole.companyId = top_companies.companyId
+            GROUP BY city, state)
+
+        SELECT CONCAT(city, ', ', state) AS location, num_companies FROM location_counts
+        ORDER BY num_companies DESC
+        LIMIT ${numLocations};
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 }
 
 // Route 10: Search locations by large company size and H1B
-// GET /highReviewCompanies/companySizeAndCaseStatus/:numLocations
+// GET /companies/locationAndApprovedH1b
 const getHRC_locateAndH1B = async function(req, res) {
+  const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
+  const query 
+    = `WITH companies_10000 AS (
+          SELECT DISTINCT c.companyId FROM Company c
+          INNER JOIN H1bCase h ON c.companyId = h.companyId 
+          WHERE h.caseStatus = 'C'
+                AND c.employeeSize = '10,000+'), 
+                
+        location_ids AS (
+          SELECT locationId FROM HasRole
+          WHERE companyId IN (SELECT companyId FROM companies_10000)), 
+          
+        locations AS (
+          SELECT locationId, city, state
+          FROM Location WHERE locationId IN (SELECT locationId FROM location_ids)),
+      
+        companyCountAtLocation AS (
+          SELECT city, state, COUNT(*) AS num_companies
+          FROM locations
+          JOIN HasRole ON locations.locationId = HasRole.locationId 
+          JOIN companies_10000 ON HasRole.companyId = companies_10000.companyId 
+          GROUP BY city, state)
+      
+        SELECT 
+          CONCAT(city, ', ', state) AS location, 
+          num_companies 
+        FROM companyCountAtLocation
+        ORDER BY num_companies DESC
+        LIMIT ${numLocations};
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 };
 
 // Route 11: Search jobs by H1B
-// GET /highReviewCompanies/:isFullTime
-const getHRC_fullTimeAndH1B = async function(req, res) {
+// GET /companies/fullTimeAndApprovedH1B
+const getHRC_fullTimeAndApprovedH1B = async function(req, res) {
+  const isFullTime = req.query.isFullTime ? req.query.isFullTime : 0;
 
+  const query 
+    = `With approvedH1B_part_time AS (
+        SELECT 
+          DISTINCT H.companyId, 
+          H.jobId, 
+          H.jobTitle 
+        FROM H1bCase H
+        WHERE H.fulltime = ${isFullTime} AND H.caseStatus = 'C'),
+      
+        job_location AS (
+          SELECT 
+            DISTINCT L.state, 
+            L.city, 
+            H.jobId, 
+            H.companyId 
+          FROM Location L
+          JOIN HasRole H ON L.locationId = H.locationId), 
+        
+        approved_part_location AS (
+          SELECT 
+            DISTINCT A.companyId, 
+            A.jobTitle, 
+            J.state, 
+            J.city
+          FROM approvedH1B_part_time A
+          JOIN job_location J ON A.jobId = J.jobId AND A.companyId = J.companyId)
+        
+        SELECT 
+          C.name AS company_name, 
+          A.jobTitle, 
+          CONCAT(A.city, ', ', A.state) AS location 
+        FROM Company C
+        INNER JOIN approved_part_location A ON C.companyId = A.companyId;
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 };
 
 // Route 12: Search industry by H1B
 // GET /highReviewCompanies/:numIndustries
-const getHRC_industry = async function(req, res) {
+const getHRC_industryWithApprovedH1B = async function(req, res) {
+  const numIndustries = req.query.numIndustries ? req.query.numIndustries : 5;
+  const sinceYear = req.query.sinceYear ? req.query.sinceYear : 2012;
 
+  const query 
+    = `WITH 
+        h1b_cases AS (
+          SELECT 
+            companyId, 
+            COUNT(*) AS num_cases FROM H1bCase
+          WHERE caseYear >= ${sinceYear}
+          GROUP BY companyId),
+    
+        top_companies AS (
+          SELECT companyId, name, employeeSize, industryId
+          FROM Company
+          WHERE companyId IN (SELECT companyId FROM h1b_cases) 
+          ORDER BY employeeSize DESC),
+
+        top_industries AS (
+          SELECT industryId, industry FROM Industry
+          WHERE industryId IN (
+            SELECT industryId FROM top_companies)),
+        
+        industry_counts AS (
+          SELECT industry, COUNT(*) AS num_companies FROM top_industries
+          JOIN top_companies ON top_industries.industryId = top_companies.industryId
+          GROUP BY industry) 
+      
+      SELECT industry, num_companies FROM industry_counts
+      ORDER BY num_companies DESC
+      LIMIT ${numIndustries};
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) { 
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
 };
 
 // Routes 13: Backend welcome page
@@ -282,12 +544,12 @@ module.exports = {
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,
-  getHRC_caseAndReviewCount,
+  getHRC_h1bAndInterview,
   getHRC_workLifeBal,
-  getHRC_reviewRateCaseStatus,
-  getHRC_numCompanyAndLocate,
+  getHRC_ratingAndCaseStatus,
+  getHRC_locationAndFulltime,
   getHRC_locateAndH1B,
-  getHRC_fullTimeAndH1B,
-  getHRC_industry,
+  getHRC_fullTimeAndApprovedH1B,
+  getHRC_industryWithApprovedH1B,
   welcome
 }
