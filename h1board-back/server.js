@@ -137,8 +137,15 @@ webapp.get('/companies/fullTimeAndApprovedH1b', routes.getHRC_fullTimeAndApprove
  * @return {industry, num_companies} on success
  */
 webapp.get('/companies/:industryAndApprovedH1b', routes.getHRC_industryWithApprovedH1B);
-
-
+/**
+ * Route 14
+ * 
+ * Login user with the inputted name and password
+ * Will not be logged in if name or password is incorrect 
+ * 
+ * @param {bodyParams}
+ * @return {userId, username, token} on success
+ */
 webapp.post('/user/signin', routes.signinUser);
 
 

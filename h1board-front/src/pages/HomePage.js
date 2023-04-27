@@ -12,7 +12,7 @@ export default function HomePage() {
   const [user, setUser] = useState(localStorage.getItem('UID') || null);
 
   return (
-    <Box>
+    <div>
       {
         user === 'null' || user === null
           ? (
@@ -21,11 +21,11 @@ export default function HomePage() {
             </Box>
           )
           : (
-            <div>
-              Hello, this is the Homepage! :D
+            <div className='myDiv'>
+              Hi, this is the homepage!!! :D
             </div>
           )
       }
-    </Box>
+    </div>
   );
 };

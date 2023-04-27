@@ -3,7 +3,7 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import { indigo, amber } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/NavBar/NavBar';
 import HomePage from './pages/HomePage';
 import LogoutComponent from './components/Logout/Logout';
@@ -32,13 +32,11 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-      <Navbar userStateChanger={userStateChanger} />
-        <div className="bodyBox">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/logout" element={<LogoutComponent />} />
-          </Routes>
-        </div>
+        <Navbar userStateChanger={userStateChanger} />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/logout" element={<LogoutComponent />} />
+        </Routes>
       </BrowserRouter>
     </ThemeProvider>
   );

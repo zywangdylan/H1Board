@@ -2,11 +2,8 @@
 
 const mysql = require('mysql');
 const config = require('./config.json');
-const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 const salt = "$2b$10$UdNqpnkWmAYDcyiP/QbYee";
-const JWT_SECRET = config.JWT_SECRET;
-// const { v4: uuidv4 } = require('uuid');
 
 // Creates MySQL connection using database credential provided in config.json
 // Do not edit. If the connection fails, make sure to check that config.json is filled out correctly
@@ -46,58 +43,11 @@ const getOneUser = async function (req, res) {
   });
 }
 
-// Routes 14: Signin user
-// POST /user/signin
-const signinUser = async function (req, res) {
-
-  try {
-    const user = {
-      name: req.body.name,
-      password: req.body.password
-    };
-
-    // Generate jwt token and this token expired in 5 minutes
-    /* const token = jwt.sign({
-      password: user.password,
-    }, JWT_SECRET, { expiresIn: '300s' }); */
-    const token = bcrypt.hashSync(req.body.password, salt);
-
-    console.log(token);
-
-    // Write the query to retrieve the user with the provided name and password
-    const query = `
-      SELECT *
-      FROM AppUser
-      WHERE name = "${user.name}" AND password = "${token}"
-      LIMIT 1
-      `
-    
-    connection.query(query, (err, data) => {
-      if (err) {
-        console.log(err);
-        res.json({});
-      } else if (data.length === 0) {
-        console.log("User name ", String(user.name), " or User password ", String(user.password), " is incorrect.");
-        res.status(404).send('User name or User password is incorrect.');
-      } else {
-
-        res.json(data);
-      }
-    });
-
-  } catch (err) {
-    console.log(err.message);
-    res.status(401).send({ message: err.message })
-  }
-}
-
 // Route 2: POST /user/signup
 const createOneUser = async function (req, res) {
   // Retrieve the name and password from the request body
   const username = req.body.name;
   const password = req.body.password;
-  // could use UUID? or other way to generate unique BigInt ID
-  // const userId = uuidv4();
   const userId = Date.now() + Math.floor(Math.random() * 100);
 
   // Check whether username or password is null or not
@@ -105,10 +55,7 @@ const createOneUser = async function (req, res) {
     res.status(404).send('Missing username or password.');
   }
 
-  // Generate jwt token and this token expired in 5 minutes
-  /* const token = jwt.sign({
-    password: password,
-  }, JWT_SECRET, { expiresIn: '300s' }); */
+  // Use bcrypt to encrypt the password
   const token = bcrypt.hashSync(req.body.password, salt);
 
   // Insert one app user into the database
@@ -586,8 +533,44 @@ const welcome = async function (req, res) {
   res.status(200).send('welcome to the backend.');
 }
 
+// Routes 14: Signin user
+// POST /user/signin
+const signinUser = async function (req, res) {
 
+  try {
+    const user = {
+      name: req.body.name,
+      password: req.body.password
+    };
 
+    // Use bcrypt to encrypt the password
+    const token = bcrypt.hashSync(req.body.password, salt);
+
+    // Write the query to retrieve the user with the provided name and password
+    const query = `
+      SELECT *
+      FROM AppUser
+      WHERE name = "${user.name}" AND password = "${token}"
+      LIMIT 1
+      `
+    
+    connection.query(query, (err, data) => {
+      if (err) {
+        console.log(err);
+        res.json({});
+      } else if (data.length === 0) {
+        console.log("User name ", String(user.name), " or User password ", String(user.password), " is incorrect.");
+        res.status(404).send('User name or User password is incorrect.');
+      } else {
+        res.json(data);
+      }
+    });
+
+  } catch (err) {
+    console.log(err.message);
+    res.status(401).send({ message: err.message })
+  }
+}
 
 module.exports = {
   getOneUser,
