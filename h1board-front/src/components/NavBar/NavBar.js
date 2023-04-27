@@ -5,7 +5,7 @@ import { Home, Logout, Person, } from '@mui/icons-material';
 import LoginModal from '../Modal/LoginModal';
 import SignupModal from '../Modal/SignupModal';
 import './style.css';
-//import { login, logout } from "../../api";
+import logo from './logo.png';
 
 async function logoutUser() {
   /* return fetch(`${logout()}`, {
@@ -66,7 +66,7 @@ export default function Navbar(props) {
             }}
             onClick={() => navigate('/')}
           >
-            {/* <img id="logo" src={logo} /> */}
+            <img id="logo" src={logo} />
           </Box>
           {
             user === 'null' || user === null
@@ -108,14 +108,6 @@ export default function Navbar(props) {
                     onClick={() => navigate('/')}
                   >
                     <Home />
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ fontWeight: 'bold', borderRadius: '25px' }}
-                    onClick={() => navigate('/profile')}
-                  >
-                    <Person />
                   </Button>
                   <Button
                     color="primary"

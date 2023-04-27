@@ -12,11 +12,11 @@ export default function HomePage() {
   const [user, setUser] = useState(localStorage.getItem('UID') || null);
 
   return (
-    <Container justify="center">
+    <Box>
       {
         user === 'null' || user === null
           ? (
-            <Box className="loginPage">
+            <Box>
               <img src={upenn} alt="homepage"/>
             </Box>
           )
@@ -26,6 +26,6 @@ export default function HomePage() {
             </div>
           )
       }
-    </Container>
+    </Box>
   );
 };
