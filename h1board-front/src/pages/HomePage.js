@@ -3,7 +3,7 @@ import { Container, Divider, Link } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
-import upenn from './upenn.jpg';
+import upenn from './homepageImg.jpg';
 import './HomePage.css';
 
 const config = require('../config.json');
