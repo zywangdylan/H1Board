@@ -15,6 +15,18 @@ connection.connect((err) => err && console.log(err));
 /******************
  * WARM UP ROUTES *
  ******************/
+const industry = async function(req, res) {
+  const id = req.params.industry_id;
+
+  connection.query(`SELECT * FROM Industry WHERE industryId='${id}'`, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data[0]);
+    }
+  });
+}
 
 // Route 1: GET /author/:type
 const author = async function(req, res) {
@@ -265,4 +277,5 @@ module.exports = {
   top_songs,
   top_albums,
   search_songs,
+  industry
 }

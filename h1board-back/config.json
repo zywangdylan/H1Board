@@ -1,9 +1,9 @@
 {
-  "rds_host": "database-1.c6op6bu0j264.us-east-1.rds.amazonaws.com",
+  "rds_host": "cis5500-final-project.c2cuzdcfe9qr.us-east-1.rds.amazonaws.com",
   "rds_port": "3306",
-  "rds_user": "admin",
-  "rds_password" : "zxw374upenn",
-  "rds_db": "SWIFTIFY",
+  "rds_user": "Group99",
+  "rds_password" : "Cis5500Group99",
+  "rds_db": "H1Board_DB",
   "server_host": "localhost",
   "server_port":"8080"
 }
