@@ -5,5 +5,6 @@
   "rds_password" : "Cis5500Group99",
   "rds_db": "H1Board_DB",
   "server_host": "localhost",
-  "server_port":"8080"
+  "server_port":"8080",
+  "JWT_SECRET": "This is our jwt secret"
 }
