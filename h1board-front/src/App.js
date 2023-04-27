@@ -3,11 +3,10 @@ import { CssBaseline, ThemeProvider } from '@mui/material'
 import { indigo, amber } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
 
-import NavBar from './components/NavBar';
+import React, {useState} from 'react';
+import Navbar from './components/NavBar/NavBar';
 import HomePage from './pages/HomePage';
-import AlbumsPage from './pages/AlbumsPage';
-import SongsPage from './pages/SongsPage';
-import AlbumInfoPage from './pages/AlbumInfoPage'
+import LogoutComponent from './components/Logout/Logout';
 
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
@@ -23,17 +22,23 @@ export const theme = createTheme({
 // our application, with each Route component representing a page and the common
 // NavBar component allowing us to navigate between pages (with hyperlinks)
 export default function App() {
+  const [userId, setUserId] = React.useState(localStorage.getItem('UID') || null);
+
+  const userStateChanger = (title) => {
+    setUserId(title);
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <NavBar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/albums" element={<AlbumsPage />} />
-          <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
-          <Route path="/songs" element={<SongsPage />} />
-        </Routes>
+      <Navbar userStateChanger={userStateChanger} />
+        <div className="bodyBox">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/logout" element={<LogoutComponent />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </ThemeProvider>
   );

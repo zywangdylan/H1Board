@@ -6,7 +6,10 @@ const config = require('./config');
 const routes = require('./routes');
 
 const webapp = express();
-webapp.use(cors({origin: '*',}));
+webapp.use(cors({
+  origin: ['http://localhost:3000','http://localhost:8080'],
+  credentials : true
+}));
 // accept command line and json inputs
 webapp.use(express.urlencoded({ extended: true }));
 webapp.use(express.json());
@@ -27,7 +30,7 @@ webapp.get('/user/:id', routes.getOneUser);
  * @param {bodyParams}
  * @return {userId, username, token} on success
  */
-webapp.post('/user', routes.createOneUser);
+webapp.post('/user/signup', routes.createOneUser);
 /**
  * Route 3, query 1
  * Get stats (company name, title, submitDate, caseStatus, industry)
@@ -134,6 +137,10 @@ webapp.get('/companies/fullTimeAndApprovedH1b', routes.getHRC_fullTimeAndApprove
  * @return {industry, num_companies} on success
  */
 webapp.get('/companies/:industryAndApprovedH1b', routes.getHRC_industryWithApprovedH1B);
+
+
+webapp.post('/user/signin', routes.signinUser);
+
 
 webapp.listen(config.server_port, () => {
   console.log(`Server running at http://${config.server_host}:${config.server_port}/`)
