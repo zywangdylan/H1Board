@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Container, TextField, Link } from '@mui/material';
+import { Container, TextField, Grid, InputAdornment, IconButton, Typography } from '@mui/material';
+import { Search } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
-import { styled } from '@mui/system';
-import Autocomplete from '@mui/material/Autocomplete';
-import SearchIcon from '@mui/icons-material/Search';
 
 const config = require('../config.json');
 
 export default function HomePage() {
-  const [songOfTheDay, setSongOfTheDay] = useState({});
-  const [author, setAuthor] = useState('');
-  const [selectedSongId, setSelectedSongId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     // fetch(`http://${config.server_host}:${config.server_port}/random`)
@@ -38,38 +34,41 @@ export default function HomePage() {
   //     field: 'plays',
   //     headerName: 'Plays'
   //   },
-  // ];
+  // ]
 
-  const options = [
-    { label: 'Apple', value: 'apple' },
-    { label: 'Banana', value: 'banana' },
-    { label: 'Cherry', value: 'cherry' },
-    { label: 'Durian', value: 'durian' },
-    { label: 'Elderberry', value: 'elderberry' },
-  ];
-
-  const classes = useStyles();
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+    // You can perform your search logic here
+  };
 
   return (
-    <Container className={classes.root}>
-      <h1 style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem' }}>H1BOARD</h1>
-      {/* Write a search bar with material ui */}
-      <Autocomplete
-        className={classes.textField}
-        options={options}
-        getOptionLabel={(option) => option.label}
-        renderInput={(params) => (
+    <Container maxWidth="md" style={{height: 'calc(100vh - 64px)', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <Grid container direction="column" justifyContent="center" alignItems="center" spacing={1} style={{marginBottom:"15rem"}}>
+        <Grid item>
+          <Typography
+            variant="h1"
+            style={{fontFamily: "'Bruno Ace SC', cursive"}}
+          >
+            H1Board
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={6} style={{width: '80%'}}>
           <TextField
-            {...params}
-            label="Search"
+            fullWidth
             variant="outlined"
+            placeholder="Search Company..."
             InputProps={{
-              ...params.InputProps,
-              endAdornment: <SearchIcon />,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <Search />
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
-        )}
-      />
+        </Grid>
+      </Grid>
     </Container>
   );
 };
