@@ -6,6 +6,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 
 import H1B from '../components/H1B';
+import CompanyReview from '../components/CompanyReview';
 
 const config = require('../config.json');
 
@@ -46,7 +47,7 @@ export default function CompanyPage() {
         >
           <div>
             { tabValue === 0 && <H1B companyInfo={companyInfo} /> }
-            { tabValue === 1 && <div> Company Review </div> }
+            { tabValue === 1 && <CompanyReview companyInfo={companyInfo} /> }
           </div>
         </CSSTransition>
       </SwitchTransition>

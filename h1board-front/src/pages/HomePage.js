@@ -8,6 +8,7 @@ const config = require('../config.json');
 export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
 
+  // TODO: Autocomplete options should be fetched from the server (most popular searches / user's search)
   const options = [
     { title: "Apple" },
     { title: "Banana" },
@@ -15,17 +16,18 @@ export default function HomePage() {
     { title: "Durian" },
   ];
 
+  // TODO: Use useEffect to initialize options with the most popular searches/companies
   useEffect(() => {
     // fetch(`http://${config.server_host}:${config.server_port}/random`)
     //   .then(res => res.json())
     //   .then(resJson => setSongOfTheDay(resJson));
 
-    // // TODO (TASK 14): add a fetch call to get the app author (name not pennkey) and store it in the state variable
     // fetch(`http://${config.server_host}:${config.server_port}/author/name`)
     //   .then(res => res.text())
     //   .then(resText => setAuthor(resText));
   }, []);
 
+  // TODO: Implement search logic, redirect to /companies/:company_id
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     // You can perform your search logic here

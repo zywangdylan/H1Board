@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Container, Button, Grid, Typography, Slider, Link } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';

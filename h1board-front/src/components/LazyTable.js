@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from '@mui/material';
 
-// This component provides a paginated MUI table that fetches data only from the specified page.
-// This optimization is known as lazy loading. It is unnecessary for you to utilize this optimization
-// in your final project, but is a good example of many React features and presented as an exercise.
-
-// Take a look at the definition of the LazyTable component. The parameters represent the properties (props)
-// passed into the component. Some of these props are optional (defaultPageSize, rowsPerPageOptions) while
-// others are required (routes, columns). Though not indicated by code, whether the props are optional or
-// required will affect how you handle them in the code.
 export default function LazyTable({ route, columns, defaultPageSize, rowsPerPageOptions }) {
   const [data, setData] = useState([]);
 
@@ -37,7 +29,7 @@ export default function LazyTable({ route, columns, defaultPageSize, rowsPerPage
     // the handler is called with parameter e (the event) and the value is e.target.value
     const newPageSize = e.target.value;
 
-    // TODO (TASK 18): set pageSize state variable and reset the current page to 1
+    // Set pageSize state variable and reset the current page to 1
     setPageSize(newPageSize);
     setPage(1);
   }
@@ -58,9 +50,8 @@ export default function LazyTable({ route, columns, defaultPageSize, rowsPerPage
           {data.map((row, idx) =>
             <TableRow key={idx}>
               {
-                // TODO (TASK 19): the next 3 lines of code render only the first column. Modify this with a map statement to render all columns.
-                // Hint: look at how we structured the map statement to render all the table headings within the <TableHead> element
-                columns.map(col => 
+                // The next 3 lines of code render only the first column. Modify this with a map statement to render all columns.
+                columns.map(col =>
                   <TableCell key={col.headerName}>
                     {/* Note the following ternary statement renders the cell using a custom renderCell function if defined, or defaultRenderCell otherwise */}
                     {col.renderCell ? col.renderCell(row) : defaultRenderCell(col, row)}
