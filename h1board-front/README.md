@@ -15,6 +15,13 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - package.json: This file contains metadata about the project and its dependencies, as well as scripts for building, testing, and running the project.
 - package-lock.json: This file is generated automatically by npm to lock down the exact versions of dependencies installed in the project.
 
+## React Components
+
+## External Packages
+- Material UI (https://material-ui.com/) - React components for faster and easier web development
+- Recharts (https://recharts.org/en-US/) - A composable charting library built on React components
+- react-transition-group (https://reactcommunity.org/react-transition-group/) - An easy way to perform animations when a React component enters or leaves the DOM
+
 ## Available Scripts
 
 In the project directory, you can run:

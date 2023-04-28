@@ -33,10 +33,7 @@ export default function CompanyPage() {
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/companies/${company_id}`)
       .then(res => res.json())
-      .then((resJson) => {
-        console.log(resJson[0]);
-        setCompanyInfo(resJson[0]);
-      });
+      .then((resJson) => setCompanyInfo(resJson[0]));
   }, []);
 
   // TODO: Trigger search when user clicks the search button with the current filter values

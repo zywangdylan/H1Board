@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { blue, yellow } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import NavBar from './components/NavBar';
 import HomePage from './pages/HomePage';
@@ -19,18 +20,26 @@ export const theme = createTheme({
 });
 
 export default function App() {
+  const location = useLocation();
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter style={{display: 'flex'}}>
-        <NavBar/>
-        <Routes style={{style: "flex: 1"}}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
-          <Route path="/companies" element={<CompaniesPage />} />
-          <Route path="/company/:company_id" element={<CompanyPage />} />
-        </Routes>
-      </BrowserRouter>
+      <NavBar/>
+      <TransitionGroup component={null}>
+        <CSSTransition
+          timeout={300}
+          classNames='fade'
+          key={location.key}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
+            <Route path="/companies" element={<CompaniesPage />} />
+            <Route path="/company/:company_id" element={<CompanyPage />} />
+          </Routes>
+        </CSSTransition>
+      </TransitionGroup>
     </ThemeProvider>
   );
 }

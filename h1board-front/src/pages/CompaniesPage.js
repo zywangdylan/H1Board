@@ -28,10 +28,7 @@ export default function CompaniesPage() {
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/companies?pageNum=${page}&pageSize=${pageSize}`)
       .then(res => res.json())
-      .then(resJson => {
-        console.log("resJson", resJson)
-        setCompanies(resJson)
-      });
+      .then(resJson => setCompanies(resJson));
   }, [page]);
 
   const flexFormat = { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' };
