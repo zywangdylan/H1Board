@@ -80,6 +80,56 @@ const createOneUser = async function(req, res) {
   });
 }
 
+// GET /companies
+const getAllCompanies = async function(req, res) {
+  // GET all companies data with pagination
+  const pageNum = req.query.pageNum ? req.query.pageNum : 1;
+  const pageSize = req.query.pageSize ? req.query.pageSize : 10;
+
+  const query = `
+    SELECT *
+    FROM Company
+    LIMIT ${pageSize}
+    OFFSET ${(pageNum - 1) * pageSize}
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// GET /companies/:id
+const getOneCompany = async function(req, res) {
+  // Retrieve companyId from the parameters
+  const id = req.params.id;
+
+  // Check id is null or not
+  if (id == null) res.status(404).send('The company id is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT *
+  FROM Company
+  WHERE companyId = ${id}
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Company id ", String(id), " does not exist.");
+      res.status(404).send('Company id does not exist.');
+    } else {
+      res.json(data);
+    }
+  });
+}
+
 // Route 3: GET /popularCompanies
 const getPopularCompanies = async function(req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
@@ -541,6 +591,8 @@ const welcome = async function(req, res) {
 module.exports = {
   getOneUser,
   createOneUser,
+  getAllCompanies,
+  getOneCompany,
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,

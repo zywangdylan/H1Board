@@ -28,6 +28,26 @@ webapp.get('/user/:id', routes.getOneUser);
  * @return {userId, username, token} on success
  */
 webapp.post('/user', routes.createOneUser);
+
+/**
+ * Get all company Info
+ * on approved or non-approved H1B cases with wage higher than a threshold, in a given industry
+ *
+ * @param {pageNum}
+ * @param {pageSize}
+ * @return {company_id, name, employeeSize, industry, industryId } on success
+ */
+ webapp.get('/companies', routes.getAllCompanies);
+
+/**
+ * Get all company Info
+ * on approved or non-approved H1B cases with wage higher than a threshold, in a given industry
+ *
+ * @param {id}
+ * @return {company_id, name, employeeSize, industry, industryId } on success
+ */
+webapp.get('/companies/:id', routes.getOneCompany);
+
 /**
  * Route 3, query 1
  * Get stats (company name, title, submitDate, caseStatus, industry)
