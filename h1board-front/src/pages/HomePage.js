@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 const config = require('../config.json');
 
 export default function HomePage() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   // TODO: Autocomplete options should be fetched from the server (most popular searches / user's search)
   const options = [
