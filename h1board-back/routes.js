@@ -130,6 +130,37 @@ const getOneCompany = async function(req, res) {
   });
 }
 
+// GET /companies/:id
+const getOneCompanyH1bSummary = async function(req, res) {
+  // Retrieve companyId from the parameters
+  const id = req.params.id;
+  const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0;
+
+  // Check id is null or not
+  if (id == null) res.status(404).send('The company id is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT 
+    companyId, 
+    SUM(IF(caseStatus = 'C', 1, 0)) as numApproved,
+    COUNT(*) as totalCases
+  FROM H1bCase
+  WHERE companyId = ${id} AND wageFrom >= ${wageFrom}
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Company id ", String(id), " does not exist.");
+      res.status(404).send('Company id does not exist.');
+    } else {
+      res.json(data);
+    }
+  });
+}
+
 // Route 3: GET /popularCompanies
 const getPopularCompanies = async function(req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
@@ -593,6 +624,7 @@ module.exports = {
   createOneUser,
   getAllCompanies,
   getOneCompany,
+  getOneCompanyH1bSummary,
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,
