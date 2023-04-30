@@ -27,14 +27,14 @@ import {
 
 const config = require("../config.json");
 
-export default function H1B(props) {
+export default function CompanySummary(props) {
   const company_id = props.companyInfo.companyId;
   console.log("company id in this page is ", props.companyInfo.companyId);
 
   const [pageSize, setPageSize] = useState(10);
   const [companySummary, setCompanySummary] = useState([]);
 
-  const [companySearch, setCompanySearch] = useState('');
+  const [companySearch, setCompanySearch] = useState("");
 
   // overall stats
   const [companyName, setCompanyName] = useState("");
@@ -111,7 +111,9 @@ export default function H1B(props) {
 
   const handleButtonClick = () => {
     fetch(
-      `http://${config.server_host}:${config.server_port}/companySummary/${0}?companyName=${companySearch.toLowerCase()}`
+      `http://${config.server_host}:${
+        config.server_port
+      }/companySummary/${0}?companyName=${companySearch.toLowerCase()}`
     )
       .then((res) => res.json())
       .then((resJson) => {
@@ -125,12 +127,13 @@ export default function H1B(props) {
               name: companySummaryWithId[0].company_name + " ratings",
               average_rating: companySummaryWithId[0].avg_rating,
               work_life_balance: companySummaryWithId[0].workLifeBalance,
-              job_security_and_advancement: companySummaryWithId[0].jobSecurityOrAdvance,
+              job_security_and_advancement:
+                companySummaryWithId[0].jobSecurityOrAdvance,
               management_score: companySummaryWithId[0].management,
               culture_score: companySummaryWithId[0].culture,
             },
           ];
-        
+
           const searchlDataStats = [
             {
               name: companySummaryWithId[0].company_name + " overall stats",
@@ -174,7 +177,10 @@ export default function H1B(props) {
                 <LabelList dataKey="work_life_balance" position="right" />
               </Bar>
               <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
-                <LabelList dataKey="job_security_and_advancement" position="right" />
+                <LabelList
+                  dataKey="job_security_and_advancement"
+                  position="right"
+                />
               </Bar>
               <Bar dataKey="management_score" fill="#FF7F50">
                 <LabelList dataKey="management_score" position="right" />
@@ -197,7 +203,7 @@ export default function H1B(props) {
                 <LabelList dataKey="num_reviews" position="right" />
               </Bar>
               <Bar dataKey="num_locations" fill="#3f51b5">
-              <LabelList dataKey="num_locations" position="right" />
+                <LabelList dataKey="num_locations" position="right" />
               </Bar>
               <Bar dataKey="num_jobs" fill="#283593">
                 <LabelList dataKey="num_jobs" position="right" />
@@ -223,7 +229,10 @@ export default function H1B(props) {
                 <LabelList dataKey="work_life_balance" position="right" />
               </Bar>
               <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
-                <LabelList dataKey="job_security_and_advancement" position="right" />
+                <LabelList
+                  dataKey="job_security_and_advancement"
+                  position="right"
+                />
               </Bar>
               <Bar dataKey="management_score" fill="#FF7F50">
                 <LabelList dataKey="management_score" position="right" />
@@ -255,8 +264,12 @@ export default function H1B(props) {
           </div>
         )}
         <div>
-          <TextField 
-          label='Company Name' value={companySearch} onChange={(e) => setCompanySearch(e.target.value)} style={{ width: "100%", margin: "1rem 0" }}/>
+          <TextField
+            label="Company Name"
+            value={companySearch}
+            onChange={(e) => setCompanySearch(e.target.value)}
+            style={{ width: "100%", margin: "1rem 0" }}
+          />
         </div>
         <Button variant="contained" color="primary" onClick={handleButtonClick}>
           Compare with Another Company

@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
 import AlbumInfoPage from './pages/AlbumInfoPage'
+import LocationPage from "./pages/LocationPage";
 
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
             <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/company/:company_id" element={<CompanyPage />} />
+            <Route path="/locations" element={<LocationPage />} />
           </Routes>
         </CSSTransition>
       </TransitionGroup>

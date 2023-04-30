@@ -12,7 +12,7 @@ import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
 const config = require('../config.json');
 
-export default function H1B(props) {
+export default function H1BCases(props) {
     const company_id = props.companyCases.companyId;
     console.log("company id is ", props.companyCases.companyId);
 

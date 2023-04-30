@@ -33,6 +33,7 @@ export default function NavBar() {
         <Toolbar disableGutters>
           <NavText href='/' text='H1BOARD' isMain />
           <NavText href='/companies' text='COMPANY' />
+          <NavText href='/locations' text='LOCATION' />
           {/* <NavText href='/songs' text='SONGS' /> */}
         </Toolbar>
       </Container>
