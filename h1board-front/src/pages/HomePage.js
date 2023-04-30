@@ -67,14 +67,12 @@ export default function HomePage() {
         </Grid>
         <Grid item xs={12} md={6} style={{ width: '80%' }}>
           <Autocomplete
-            /* value={searchTerm} */
             onChange={(event, newValue) => {
               if (newValue != null) {
                 setSearchTerm(newValue.name);
               }
             }}
             filterOptions={filterOptions}
-            /* options={options} */
             options={companiesName}
             getOptionLabel={(option) => option.name ? option.name : ""}
             renderInput={(params) => (
