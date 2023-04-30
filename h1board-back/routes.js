@@ -18,7 +18,7 @@ const connection = mysql.createConnection({
 connection.connect((err) => err && console.log(err));
 
 // Route 1: GET /user/:id
-const getOneUser = async function(req, res) {
+const getOneUser = async function (req, res) {
   // Retrieve userId from the parameters
   const id = req.params.id;
 
@@ -45,7 +45,7 @@ const getOneUser = async function(req, res) {
 }
 
 // Route 2: POST /user
-const createOneUser = async function(req, res) {
+const createOneUser = async function (req, res) {
   // Retrieve the name and password from the request body
   const username = req.body.name;
   const password = req.body.password;
@@ -81,7 +81,7 @@ const createOneUser = async function(req, res) {
 }
 
 // GET /companies
-const getAllCompanies = async function(req, res) {
+const getAllCompanies = async function (req, res) {
   // GET all companies data with pagination
   const pageNum = req.query.pageNum ? req.query.pageNum : 1;
   const pageSize = req.query.pageSize ? req.query.pageSize : 10;
@@ -104,7 +104,7 @@ const getAllCompanies = async function(req, res) {
 }
 
 // GET /companies/:id
-const getOneCompany = async function(req, res) {
+const getOneCompany = async function (req, res) {
   // Retrieve companyId from the parameters
   const id = req.params.id;
 
@@ -130,8 +130,61 @@ const getOneCompany = async function(req, res) {
   });
 }
 
+// GET /company?name=
+const getCompanyByName = async function (req, res) {
+  // Retrieve companyName from the parameters
+  const name = req.query.name;
+
+  // Check id is null or not
+  if (name == null) res.status(404).send('The company name is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT companyId
+  FROM Company
+  WHERE name = '${name}'
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Company name ", String(name), " does not exist.");
+      res.status(404).send('Company name does not exist.');
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// GET /companiesName
+const getCompaniesName = async function (req, res) {
+  // Retrieve companyName from the parameters
+  // const name = req.query.name;
+
+  // Check id is null or not
+  // if (name == null) res.status(404).send('The company name is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT DISTINCT name
+  FROM Company
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Can't get companies name");
+      res.status(404).send("Can't get companies name.");
+    } else {
+      res.json(data);
+    }
+  });
+}
+
 // Route 3: GET /popularCompanies
-const getPopularCompanies = async function(req, res) {
+const getPopularCompanies = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
   const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0.0;
@@ -164,7 +217,7 @@ const getPopularCompanies = async function(req, res) {
 
 // Route 4: GET /companies/review, obtain company name and review with certain number of reviews and range of rating.
 // Ordered in avg rating descending order
-const getHRC_Review = async function(req, res) {
+const getHRC_Review = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from parameters
   const reviewNum = req.query.reviewNum ? req.query.reviewNum : 0;
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
@@ -203,7 +256,7 @@ const getHRC_Review = async function(req, res) {
 
 // TODO: optimize slow query 5
 // Route 5: GET /companies/empSize
-const getHRC_empSize = async function(req, res) {
+const getHRC_empSize = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from parameters
   const empSize = req.query.empSize ? req.query.empSize : 400;
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
@@ -260,7 +313,7 @@ const getHRC_empSize = async function(req, res) {
 
 // TODO: optimize slow query 6
 // Route 6: GET /companies/h1bAndInterview
-const getHRC_h1bAndInterview = async function(req, res) {
+const getHRC_h1bAndInterview = async function (req, res) {
   const numInterviewReviews = req.query.numInterviewReviews ? req.query.numInterviewReviews : 0;
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
 
@@ -299,7 +352,7 @@ const getHRC_h1bAndInterview = async function(req, res) {
 
 // Query 8
 // Route 7: GET /companies/workLifeBalance
-const getHRC_workLifeBal = async function(req, res) {
+const getHRC_workLifeBal = async function (req, res) {
   const yearFloor = req.query.yearFloor ? req.query.yearFloor : 0;
   const yearCeiling = req.query.yearCeiling ? req.query.yearCeiling : 2025;
   const avfWlbRatingFloor = req.query.avfWlbRatingFloor ? req.query.avfWlbRatingFloor : 0;
@@ -342,7 +395,7 @@ const getHRC_workLifeBal = async function(req, res) {
 }
 
 // Route 8: GET /companies/ratingAndCaseStatus, query 10
-const getHRC_ratingAndCaseStatus = async function(req, res) {
+const getHRC_ratingAndCaseStatus = async function (req, res) {
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0;
   const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100;
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
@@ -383,7 +436,7 @@ const getHRC_ratingAndCaseStatus = async function(req, res) {
 
 // Route 9: /companies/locationAndFulltime
 // List the places with the most companies (of a certain scale) offering fulltime jobs.
-const getHRC_locationAndFulltime = async function(req, res) {
+const getHRC_locationAndFulltime = async function (req, res) {
   const numCompanies = req.query.numCompanies ? req.query.numCompanies : 50;
   const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
@@ -443,7 +496,7 @@ const getHRC_locationAndFulltime = async function(req, res) {
 
 // Route 10: Search locations by large company size and H1B
 // GET /companies/locationAndApprovedH1b
-const getHRC_locateAndH1B = async function(req, res) {
+const getHRC_locateAndH1B = async function (req, res) {
   const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
   const query
@@ -488,7 +541,7 @@ const getHRC_locateAndH1B = async function(req, res) {
 
 // Route 11: Search jobs by H1B
 // GET /companies/fullTimeAndApprovedH1B
-const getHRC_fullTimeAndApprovedH1B = async function(req, res) {
+const getHRC_fullTimeAndApprovedH1B = async function (req, res) {
   const isFullTime = req.query.isFullTime ? req.query.isFullTime : 0;
 
   const query
@@ -538,7 +591,7 @@ const getHRC_fullTimeAndApprovedH1B = async function(req, res) {
 
 // Route 12: Search industry by H1B
 // GET /highReviewCompanies/:numIndustries
-const getHRC_industryWithApprovedH1B = async function(req, res) {
+const getHRC_industryWithApprovedH1B = async function (req, res) {
   const numIndustries = req.query.numIndustries ? req.query.numIndustries : 5;
   const sinceYear = req.query.sinceYear ? req.query.sinceYear : 2012;
 
@@ -584,7 +637,7 @@ const getHRC_industryWithApprovedH1B = async function(req, res) {
 
 // Routes 13: Backend welcome page
 // GET /
-const welcome = async function(req, res) {
+const welcome = async function (req, res) {
   res.status(200).send('welcome to the backend.');
 }
 
@@ -593,6 +646,8 @@ module.exports = {
   createOneUser,
   getAllCompanies,
   getOneCompany,
+  getCompanyByName,
+  getCompaniesName,
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,

@@ -49,6 +49,21 @@ webapp.post('/user', routes.createOneUser);
 webapp.get('/companies/:id', routes.getOneCompany);
 
 /**
+ * Get a company Id by name
+ *
+ * @param {name}
+ * @return {company_id} on success
+ */
+webapp.get('/company', routes.getCompanyByName);
+
+/**
+ * Get all companies' name
+ *
+ * @return {name} on success
+ */
+webapp.get('/companiesName', routes.getCompaniesName);
+
+/**
  * Route 3, query 1
  * Get stats (company name, title, submitDate, caseStatus, industry)
  * on approved or non-approved H1B cases with wage higher than a threshold, in a given industry
