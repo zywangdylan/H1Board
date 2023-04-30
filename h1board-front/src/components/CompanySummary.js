@@ -178,7 +178,7 @@ export default function H1B(props) {
           </div>
         ) : (
         <div style={{ margin: "2rem 0" }}>
-          <div>
+          <div style={{ margin: "1.5rem 0"}}>
             <Typography variant="h4">Company Description</Typography>
             <Typography variant="body1">{description}</Typography>
           </div>
