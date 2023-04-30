@@ -170,6 +170,31 @@ webapp.get('/companies/:industryAndApprovedH1b', routes.getHRC_industryWithAppro
 webapp.post('/user/signin', routes.signinUser);
 
 
+/**
+ * Get all company Info
+ * on approved or non-approved H1B cases with wage higher than a threshold, in a given industry
+ *
+ * @param {id}
+ * @return {company_id, name, employeeSize, industry, industryId } on success
+ */
+webapp.get('/h1bSummary/:id', routes.getOneCompanyH1bSummary);
+
+/**
+ * Get a company's h1bcases Info
+ *
+ * @param {id}
+ * @return {h1bCaseId, empName, jobTitle, fulltime,caseStatus,caseYear, submitDate, decisionDate, wageFrom } on success
+ */
+webapp.get('/h1bCases/:id', routes.getOneCompanyH1bCases);
+
+/**
+ * Get a company's h1bcases Info
+ *
+ * @param {id}
+ * @return {company_name, industry, avg_rating, num_reviews, text_review, num_locations, num_jobs } on success
+ */
+webapp.get('/companySummary/:id', routes.getOneCompanySummary);
+
 webapp.listen(config.server_port, () => {
   console.log(`Server running at http://${config.server_host}:${config.server_port}/`)
 });

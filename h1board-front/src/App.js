@@ -3,7 +3,7 @@ import { CssBaseline, ThemeProvider, Alert } from '@mui/material'
 import { blue, yellow } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import jwt_decode from "jwt-decode";
 
 import NavBar from './components/NavBar';
@@ -22,6 +22,7 @@ export const theme = createTheme({
 });
 
 export default function App() {
+  const appRef = useRef(null);
   const location = useLocation();
   const [userId, setUserId] = useState(localStorage.getItem('UID') || null);
   const [loginAlert, setLoginAlert] = useState(false);
@@ -67,6 +68,7 @@ export default function App() {
           timeout={300}
           classNames='fade'
           key={location.key}
+          nodeRef={appRef}
         >
           <Routes location={location}>
             <Route path="/" element={<HomePage />} />
