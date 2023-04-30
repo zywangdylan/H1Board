@@ -4,7 +4,8 @@ import {
   Button,
   TextField,
   Typography,
-  Link
+  Link,
+  Backdrop
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 
@@ -19,6 +20,7 @@ import {
 } from "recharts";
 import ErrorIcon from '@mui/icons-material/Error';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from "react-router-dom";
 
 const config = require("../config.json");
@@ -50,8 +52,10 @@ export default function H1B(props) {
   const [statsData, setStatsData] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
   const [noResult, setNoResult] = useState(false);
+  const [openLoading, setOpenLoading] = useState(false);
 
   useEffect(() => {
+    setOpenLoading(true);
     fetch(
       `http://${config.server_host}:${config.server_port}/companySummary/${company_id}`
     )
@@ -86,9 +90,11 @@ export default function H1B(props) {
           setManagement(companySummaryWithId[0].management);
           setCulture(companySummaryWithId[0].culture);
         }
+        setOpenLoading(false);
       })
       .catch((err) => {
         setNoResult(true);
+        setOpenLoading(false);
       });
   }, []);
 
@@ -113,6 +119,7 @@ export default function H1B(props) {
   ];
 
   const handleButtonClick = () => {
+    setOpenLoading(true);
     fetch(
       `http://${config.server_host}:${config.server_port}/companySummary/${0}?companyName=${companySearch.toLowerCase()}`
     )
@@ -146,6 +153,7 @@ export default function H1B(props) {
           setRatingData([initialDataRatings[0], searchDataRatings[0]]);
           setStatsData([initialDataStats[0], searchlDataStats[0]]);
         }
+        setOpenLoading(false);
       });
     setButtonClicked(true);
   };
@@ -283,6 +291,12 @@ export default function H1B(props) {
         </div>
         )
       }
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 }

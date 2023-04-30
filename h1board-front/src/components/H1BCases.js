@@ -1,19 +1,24 @@
 import * as React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, Grid, Link, Typography, Backdrop } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import ErrorIcon from '@mui/icons-material/Error';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const config = require('../config.json');
 
 export default function H1B(props) {
+    const navigate = useNavigate();
     const { company_id } = useParams();
 
+    const [openLoading, setOpenLoading] = useState(false);
     const [pageSize, setPageSize] = useState(10);
     const [companyCases, setCompanyCases] = useState([]);
     const [companySummary, setCompanySummary] = useState([]);
@@ -22,15 +27,27 @@ export default function H1B(props) {
     const [caseStatus, setCaseStatus] = useState(true);
     const [submitDate, setSubmitDate] = useState(dayjs(null));
     const [decisionDate, setDecisionDate] =useState(dayjs(null));
+    const [noResult, setNoResult] = useState(false);
 
     useEffect(() => {
+      setOpenLoading(true);
       Promise.all([
-        fetch(`http://${config.server_host}:${config.server_port}/h1bCases/${company_id}`),
-        fetch(`http://${config.server_host}:${config.server_port}/h1bSummary/${company_id}`),
+        fetch(`http://${config.server_host}:${config.server_port}/h1bCases/${company_id}`)
+          .then(res => {
+            if (res.status <= 200 || res.status >= 400) {
+              throw new Error(res.statusText);
+            }
+            return res
+          }),
+        fetch(`http://${config.server_host}:${config.server_port}/h1bSummary/${company_id}`)
+          .then(res => {
+            if (res.status <= 200 || res.status >= 400) {
+              throw new Error(res.statusText);
+            }
+            return res
+          })
       ])
-        .then(([resCases, resSum]) =>
-          Promise.all([resCases.json(), resSum.json()])
-        )
+        .then(([resCases, resSum]) => Promise.all([resCases.json(), resSum.json()]))
         .then(([dataCases, dataSum]) => {
           const h1bCasesWithId = dataCases.map((cases) => ({
             id: cases.h1bCaseId,
@@ -44,18 +61,24 @@ export default function H1B(props) {
           } else {
             setCompanySummary([]);
           }
+          setOpenLoading(false)
+        })
+        .catch ((error) => {
+          setNoResult(true);
+          setOpenLoading(false)
+          throw Error(error.message);
         });
     }, [company_id]);
 
     const search = () => {
-        Promise.all([
+      setOpenLoading(true)
+      Promise.all([
           fetch(`http://${config.server_host}:${config.server_port}/h1bCases/${company_id}?fullTime=${fullTime}
-          &caseStatus=${caseStatus}&submitDate=${submitDate}&decisionDate=${decisionDate}`),
-          fetch(`http://${config.server_host}:${config.server_port}/h1bSummary/${company_id}?submitDate=${submitDate}&decisionDate=${decisionDate}`),
+          &caseStatus=${caseStatus}&submitDate=${submitDate}&decisionDate=${decisionDate}`)
+          ,
+          fetch(`http://${config.server_host}:${config.server_port}/h1bSummary/${company_id}?submitDate=${submitDate}&decisionDate=${decisionDate}`)
         ])
-        .then(([resCases, resSummary]) =>
-          Promise.all([resCases.json(), resSummary.json()])
-        )
+        .then(([resCases, resSummary]) => Promise.all([resCases.json(), resSummary.json()]))
         .then(([dataCases, dataSummary]) => {
           const h1bCasesWithId = dataCases.map((cases) => ({ id : cases.h1bCaseId, ...cases}));
           setCompanyCases(h1bCasesWithId);
@@ -66,7 +89,14 @@ export default function H1B(props) {
           } else {
             setCompanySummary([]);
           }
-        });
+          setOpenLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setOpenLoading(false);
+          setCompanyCases([]);
+          setCompanySummary([]);
+        })
     }
 
     const casesColumns = [
@@ -90,82 +120,108 @@ export default function H1B(props) {
 
     return (
       <div>
-        <div style={{ margin: "2rem 0" }}>
-          <Grid container spacing={3} style={{ margin: "2rem 0" }}>
-            <Grid item xs={6}>
-              <FormControlLabel
-                label="Full Time"
-                control={
-                  <Checkbox
-                    checked={fullTime}
-                    onChange={(e) => setFullTime(e.target.checked)}
-                  />
-                }
+        {
+          noResult ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'center'}}>
+              <ErrorIcon style={{ fontSize: 42 }} />
+              <Typography variant="h4">Company Not Found</Typography>
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  navigate('/companies', { replace: true });
+                }}
+                style={{ marginTop: "1rem", display: 'flex', alignItems: 'center' }}
+              >
+                <KeyboardArrowLeftIcon /> Go Back to Companies Page
+              </Link>
+            </div>
+          ) : (
+            <div>
+              <div style={{ margin: "2rem 0" }}>
+                <Grid container spacing={3} style={{ margin: "2rem 0" }}>
+                  <Grid item xs={6}>
+                    <FormControlLabel
+                      label="Full Time"
+                      control={
+                        <Checkbox
+                          checked={fullTime}
+                          onChange={(e) => setFullTime(e.target.checked)}
+                        />
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControlLabel
+                      label="Case Approved"
+                      control={
+                        <Checkbox
+                          checked={caseStatus}
+                          onChange={(e) => setCaseStatus(e.target.checked)}
+                        />
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <p>Submit Date</p>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                       <StaticDatePicker
+                          orientation="landscape"
+                          label="Submit Date picker"
+                          value={submitDate}
+                          onChange={(newValue) => setSubmitDate(newValue)}
+                       />
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <p>Decision Date</p>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                       <StaticDatePicker
+                          orientation="landscape"
+                          label="Decision Date picker"
+                          value={decisionDate}
+                          onChange={(newValue) => setDecisionDate(newValue)}
+                       />
+                    </LocalizationProvider>
+                  </Grid>
+                </Grid>
+                <Button
+                  variant="contained"
+                  onClick={() => search()}
+                  style={{ left: "50%", transform: "translateX(-50%)" }}
+                >
+                  Search
+                </Button>
+              </div>
+
+              <h3>H1B Stats Summary table</h3>
+              <DataGrid
+                rows={companySummary}
+                columns={summaryColumns}
+                pageSize={pageSize}
+                rowsPerPageOptions={[5, 10, 25]}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                autoHeight
               />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControlLabel
-                label="Case Approved"
-                control={
-                  <Checkbox
-                    checked={caseStatus}
-                    onChange={(e) => setCaseStatus(e.target.checked)}
-                  />
-                }
+
+              <h3>H1B Cases </h3>
+              <DataGrid
+                rows={companyCases}
+                columns={casesColumns}
+                pageSize={pageSize}
+                rowsPerPageOptions={[5, 10, 25]}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                autoHeight
               />
-            </Grid>
-            <Grid item xs={6}>
-              <p>Submit Date</p>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                 <StaticDatePicker
-                    orientation="landscape"
-                    label="Submit Date picker"
-                    value={submitDate}
-                    onChange={(newValue) => setSubmitDate(newValue)}
-                 />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item xs={6}>
-              <p>Decision Date</p>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                 <StaticDatePicker
-                    orientation="landscape"
-                    label="Decision Date picker"
-                    value={decisionDate}
-                    onChange={(newValue) => setDecisionDate(newValue)}
-                 />
-              </LocalizationProvider>
-            </Grid>
-          </Grid>
-
-          <Button
-            variant="contained"
-            onClick={() => search()}
-            style={{ left: "50%", transform: "translateX(-50%)" }}
-          >
-            Search
-          </Button>
-        </div>
-
-        <h3>H1B Stats Summary table</h3>
-        <DataGrid
-          rows={companySummary}
-          columns={summaryColumns}
-          pageSize={pageSize}
-          rowsPerPageOptions={[5, 10, 25]}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          autoHeight
-        />
-
-        <h3>H1B Cases </h3>
-        <DataGrid
-          rows={companyCases}
-          columns={casesColumns}
-          pageSize={pageSize}
-          rowsPerPageOptions={[5, 10, 25]}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          autoHeight
-        />
+            </div>
+          )
+        }
+        <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={openLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </div>
     );
   }
