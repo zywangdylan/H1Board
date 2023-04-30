@@ -14,7 +14,6 @@ export default function CompanyPage() {
   const { company_id } = useParams();
   const [companyInfo, setCompanyInfo] = useState({});
   const [tabValue, setTabValue] = useState(0);
-  const currentNode = useRef(null);
 
   // Switch between tabs when user clicks on a tab
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
@@ -31,7 +30,13 @@ export default function CompanyPage() {
     <Container style={{display: 'flex', flexDirection:'column', minHeight: '70vh'}}>
       <div style={{display: 'flex', flexDirection:'column'}}>
         <Typography variant="h3" style={{marginTop: '2rem'}}>{ companyInfo.name }</Typography>
-        <Chip style={{maxWidth: '120px', marginTop: '0.5rem'}} label={ companyInfo.industry } color="primary" />
+        {
+          companyInfo.industry == null ? <></> : (
+            <div>
+              <Chip style={{marginTop: '0.5rem'}} label={ companyInfo.industry } color="primary" />
+            </div>
+          )
+        }
       </div>
       <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
         <Tabs value={tabValue} onChange={handleChangeTab} aria-label="icon label tabs example">
@@ -45,7 +50,6 @@ export default function CompanyPage() {
           key={tabValue}
           timeout={300}
           classNames="fade"
-          nodeRef={currentNode}
           unmountOnExit
         >
           <div style={{flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'center'}}>

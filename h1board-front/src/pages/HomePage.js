@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Container, TextField, Grid, InputAdornment, IconButton, Typography, Autocomplete, createFilterOptions } from '@mui/material';
 import { Search } from '@mui/icons-material';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const config = require('../config.json');
 
@@ -88,8 +88,8 @@ export default function HomePage() {
                   ...params.InputProps,
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton>
-                        <Search onClick={handleSearch} />
+                      <IconButton onClick={handleSearch}>
+                        <Search />
                       </IconButton>
                     </InputAdornment>
                   ),

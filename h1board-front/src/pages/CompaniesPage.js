@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Box, Container, List, ListItemButton, ListItemIcon, ListItemText, Typography, Pagination } from '@mui/material';
+import { Box, Container, List, ListItemButton, ListItemIcon, ListItemText, Typography, Pagination, Backdrop } from '@mui/material';
 import InboxIcon from '@mui/icons-material/Inbox';
 import { useNavigate } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const config = require('../config.json');
 
@@ -11,6 +12,7 @@ export default function CompaniesPage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const navigate = useNavigate();
+  const [openLoading, setOpenLoading] = useState(false);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -25,9 +27,13 @@ export default function CompaniesPage() {
   };
 
   useEffect(() => {
+    setOpenLoading(true);
     fetch(`http://${config.server_host}:${config.server_port}/companies?pageNum=${page}&pageSize=${pageSize}`)
       .then(res => res.json())
-      .then(resJson => setCompanies(resJson));
+      .then(resJson => {
+        setCompanies(resJson)
+        setOpenLoading(false)
+      });
   }, [page]);
 
   const flexFormat = { display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' };
@@ -56,6 +62,12 @@ export default function CompaniesPage() {
           <Pagination count={19980} page={page} onChange={handlePageChange} style={{margin: "2rem 0"}}/>
         </div>
       </Box>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Container>
   );
 }

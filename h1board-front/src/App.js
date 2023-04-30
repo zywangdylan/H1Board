@@ -22,7 +22,6 @@ export const theme = createTheme({
 });
 
 export default function App() {
-  const appRef = useRef(null);
   const location = useLocation();
   const [userId, setUserId] = useState(localStorage.getItem('UID') || null);
   const [loginAlert, setLoginAlert] = useState(false);
@@ -68,7 +67,6 @@ export default function App() {
           timeout={300}
           classNames='fade'
           key={location.key}
-          nodeRef={appRef}
         >
           <Routes location={location}>
             <Route path="/" element={<HomePage />} />
