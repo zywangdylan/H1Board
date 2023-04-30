@@ -54,7 +54,7 @@ export default function NavBar(props) {
   const navigate = useNavigate();
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignup, setOpenSignup] = useState(false);
-  const [loginAlert, setLoginAlert] = useState(false);
+  const [loginAlert, setLoginAlert] = useState(props.setLoginAlert || false);
   const [signupAlert, setSignupAlert] = useState(false);
   const [signupResult, setSignupResult] = useState(null);
   const [user, setUser] = useState(localStorage.getItem('UID') || null);

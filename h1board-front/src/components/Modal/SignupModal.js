@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -72,6 +72,21 @@ const SignupModal = forwardRef(({ setOpen, setSignupAlert, setResult }, ref) => 
     },
   });
 
+  useEffect(() => {
+    /* global google */
+    google.accounts.id.renderButton(
+      document.getElementById('g_id_signup'),
+      {
+        theme: 'outline',
+        size: 'large',
+        text: 'continue_with',
+        logo_alignment: 'left',
+        width: '300',
+        height: '50'
+      }
+    );
+  }, [])
+
   return (
     <Box component="form" className="signUpBox">
       <Box sx={{ backgroundColor: '#01256E', height: '1rem', mb: 5 }} />
@@ -113,11 +128,12 @@ const SignupModal = forwardRef(({ setOpen, setSignupAlert, setResult }, ref) => 
         <FormHelperText id="login-error-text">{errorHint}</FormHelperText>
       </FormControl>
       <Box sx={{
-        display: 'flex', justifyContent: 'space-between', mx: { xs: 1, md: 5 }, my: 2,
+        display: 'flex', flexDirection: 'column',justifyContent: 'center', alignItems: 'center', mx: { xs: 1, md: 5 }, my: 2,
       }}
       >
+        <div id="g_id_signup" style={{ marginTop: '1rem' }}></div>
         <Button
-          sx={{ mt: 1, backgroundColor: '#01256E' }}
+          sx={{ mt: 1, backgroundColor: '#01256E', width: 300 }}
           name={"signUpSubmitModalButton"}
           variant="contained"
           color="primary"

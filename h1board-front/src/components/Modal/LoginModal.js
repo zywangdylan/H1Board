@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import './style.css';
-import { useNavigate } from "react-router-dom";
 
 const config = require('../../config.json');
 
@@ -42,6 +41,7 @@ async function loginUser(data) {
       throw Error(error.message);
     });
 }
+
 const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setResult }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorHint, setErrorHint] = useState('');
@@ -75,6 +75,21 @@ const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setRe
   };
 
   return (
+    useEffect(() => {
+       /* global google */
+      google.accounts.id.renderButton(
+        document.getElementById('g_id_onload'),
+        {
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          logo_alignment: 'left',
+          width: '300',
+          height: '50'
+        }
+      );
+    }, []),
+
     <Box component="form" className="loginBox">
       <Box sx={{ backgroundColor: 'primary', height: '1rem', mb: 5 }} />
       <Typography variant="h2" sx={{ m: 1, textAlign: 'center' }}>Login</Typography>
@@ -110,9 +125,10 @@ const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setRe
         />
         <FormHelperText id="login-error-text">{errorHint}</FormHelperText>
       </FormControl>
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <div id="g_id_onload" style={{ marginTop: '1rem' }}></div>
         <Button
-          sx={{ mt: 1, backgroundColor: '#01256E' }}
+          sx={{ mt: 1, backgroundColor: '#01256E', width: 300 }}
           variant="contained"
           data-testid="submitButton"
           type="submit"
