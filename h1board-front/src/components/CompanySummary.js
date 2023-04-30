@@ -246,16 +246,16 @@ export default function H1B(props) {
                 <Bar dataKey="average_rating" fill="#82ca9d">
                   <LabelList dataKey="average_rating" position="right" />
                 </Bar>
-                <Bar dataKey="work_life_balance" fill="#DFFF00">
+                <Bar dataKey="work_life_balance" fill="#98D8AA">
                   <LabelList dataKey="work_life_balance" position="right" />
                 </Bar>
-                <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
+                <Bar dataKey="job_security_and_advancement" fill="#F3E99F">
                   <LabelList dataKey="job_security_and_advancement" position="right" />
                 </Bar>
-                <Bar dataKey="management_score" fill="#FF7F50">
+                <Bar dataKey="management_score" fill="#F7D060">
                   <LabelList dataKey="management_score" position="right" />
                 </Bar>
-                <Bar dataKey="culture_score" fill="#DE3163">
+                <Bar dataKey="culture_score" fill="#FF6D60">
                   <LabelList dataKey="culture_score" position="right" />
                 </Bar>
               </BarChart>
