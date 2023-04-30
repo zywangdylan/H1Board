@@ -6,7 +6,9 @@ import ArticleIcon from '@mui/icons-material/Article';
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 
 import H1B from '../components/H1B';
+import H1BCases from '../components/H1BCases';
 import CompanyReview from '../components/CompanyReview';
+import CompanySummary from '../components/CompanySummary';
 
 const config = require('../config.json');
 
@@ -32,8 +34,8 @@ export default function CompanyPage() {
       <Chip label={ companyInfo.industry } color="primary" />
       <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
         <Tabs value={tabValue} onChange={handleChangeTab} aria-label="icon label tabs example">
-          <Tab icon={<ArticleIcon />} label="H1B Data" />
-          <Tab icon={<RateReviewIcon />} label="Company Reviews" />
+          <Tab icon={<ArticleIcon />} label="H1B Cases" />
+          <Tab icon={<RateReviewIcon />} label="Company Summary" />
         </Tabs>
       </div>
 
@@ -46,8 +48,10 @@ export default function CompanyPage() {
             unmountOnExit
         >
           <div>
-            { tabValue === 0 && <H1B companyInfo={companyInfo} /> }
-            { tabValue === 1 && <CompanyReview companyInfo={companyInfo} /> }
+            {/* { tabValue === 0 && <H1B companyInfo={companyInfo} /> }
+            { tabValue === 1 && <CompanyReview companyInfo={companyInfo} /> } */}
+            { tabValue === 0 && <H1BCases companyCases = {companyInfo} /> }
+            { tabValue === 1 && <CompanySummary companyInfo={companyInfo} /> }
           </div>
         </CSSTransition>
       </SwitchTransition>
