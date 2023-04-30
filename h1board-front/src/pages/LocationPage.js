@@ -1,25 +1,22 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { Map, GoogleApiWrapper, Marker, InfoWindow } from "google-maps-react";
 import {
   Button,
   Checkbox,
-  Container,
   FormControlLabel,
   Grid,
-  Link,
-  Slider,
-  TextField,
 } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select from "@mui/material/Select";
 
 const config = require("../config.json");
+const locationsFile = require("../locations.json");
 
 const MapContainer = (props) => {
   const [caseStatus, setCaseStatus] = useState(true);
-  const [empSize, setEmpSize] = useState("");
+  const [empSize, setEmpSize] = useState("10,000+");
   const [searchResults, setSearchResults] = useState([]);
   const [state, setState] = useState({
     activeMarker: null,
@@ -49,35 +46,16 @@ const MapContainer = (props) => {
     margin: "5px 0",
   };
 
-  const locations = [
-    {
-      name: "Mountain View, CA",
-      companies: 4553,
-      lat: 37.386051,
-      lng: -122.083855,
-    },
-    {
-      name: "Cupertino, CA",
-      companies: 2367,
-      lat: 37.322998,
-      lng: -122.032182,
-    },
-    { name: "Nashville, TN", companies: 2046, lat: 36.162664, lng: -86.781602 },
-    { name: "Chicago, IL", companies: 1643, lat: 41.878113, lng: -87.629799 },
-    { name: "San Jose, CA", companies: 1229, lat: 37.338208, lng: -121.886329 },
-    { name: "Palo Alto, CA", companies: 938, lat: 37.441883, lng: -122.143019 },
-    { name: "Houston, TX", companies: 865, lat: 29.760427, lng: -95.369803 },
-    { name: "New York, NY", companies: 757, lat: 40.712776, lng: -74.005974 },
-    { name: "Milwaukee, WI", companies: 756, lat: 43.038902, lng: -87.906471 },
-    {
-      name: "Minneapolis, MN",
-      companies: 712,
-      lat: 44.977753,
-      lng: -93.265011,
-    },
-  ];
-
   const search = () => {
+    const key = caseStatus + '_' + empSize;
+    const locationsData = locationsFile.find(obj => obj.key === key);
+    setSearchResults(locationsData.value);
+  };
+
+  // fetch google map api
+  const storedData = [];
+  const search_unused = () => {
+    let locationsDataArray = JSON.parse(localStorage.getItem("locationsData")) || [];
     fetch(
       `http://${config.server_host}:${config.server_port}/locations?caseStatus=${caseStatus}&empSize=${empSize}`
     )
@@ -88,7 +66,7 @@ const MapContainer = (props) => {
           return fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
               locationName
-            )}&key=AIzaSyAv6mJfuCjDGrFhvanRT51FKyw6AbJ2Nec`
+            )}&key=${config.API_KEY}`
           )
             .then((response) => response.json())
             .then((data) => {
@@ -109,6 +87,12 @@ const MapContainer = (props) => {
         Promise.all(fetchPromises)
           .then((locationsData) => {
             console.log(locationsData);
+            const key = caseStatus + '_' + empSize;
+            storedData.push({key: key, value: locationsData});
+
+            locationsDataArray = [...locationsDataArray, ...storedData];
+            localStorage.setItem("locationsData", JSON.stringify(locationsDataArray));
+
             setSearchResults(locationsData);
           })
           .catch((error) => {
@@ -118,7 +102,23 @@ const MapContainer = (props) => {
       .catch((error) => {
         console.error(error);
       });
+
   };
+
+  // download localstorage into local file in json format
+  const download = () => {
+    let locationsDataArray = JSON.parse(localStorage.getItem("locationsData")) || [];
+    const dataString = JSON.stringify(locationsDataArray);
+    const blob = new Blob([dataString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "locations.json";
+    // Append the link to the document and click it
+    document.body.appendChild(link);
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div style={{ margin: "2rem 0" }}>
@@ -166,6 +166,14 @@ const MapContainer = (props) => {
         Search
       </Button>
 
+      {/* <Button
+        variant="contained"
+        onClick={() => download()}
+        style={{ padding: "10px 20px",left: "50%", transform: "translateX(-50%)", textAlign: "left" }}
+      >
+        download
+      </Button> */}
+
       <div>
       <h1 style={{ textAlign: 'center' }}>Location and Company Size Map</h1>
       {searchResults.length > 0 ? (
@@ -210,5 +218,5 @@ const MapContainer = (props) => {
 };
 
 export default GoogleApiWrapper({
-  apiKey: "AIzaSyAv6mJfuCjDGrFhvanRT51FKyw6AbJ2Nec",
+  apiKey: config.API_KEY,
 })(MapContainer);
