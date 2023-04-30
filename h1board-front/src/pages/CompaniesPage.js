@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Container, List, ListItemButton, ListItemIcon, ListItemText, Typography, Pagination } from '@mui/material';
 import InboxIcon from '@mui/icons-material/Inbox';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const config = require('../config.json');
 
@@ -12,14 +12,13 @@ export default function CompaniesPage() {
   const pageSize = 10;
   const navigate = useNavigate();
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (event, value) => {
     setPage(value);
   };
 
   // TODO: HandleListItemClick function will redict user to the specific company information page
   const handleListItemClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    index: number,
+    event, index
   ) => {
     setSelectedIndex(index);
     navigate(`/company/${index}`);
@@ -54,7 +53,7 @@ export default function CompaniesPage() {
           </List>
         )}
         <div style={{display: "flex", justifyContent:"end"}}>
-          <Pagination count={10} page={page} onChange={handlePageChange} style={{margin: "2rem 0"}}/>
+          <Pagination count={19980} page={page} onChange={handlePageChange} style={{margin: "2rem 0"}}/>
         </div>
       </Box>
     </Container>
