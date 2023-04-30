@@ -1,0 +1,18 @@
+.loginBox {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    /*'rgba(0; 0; 0; 0.35) 0px 5px 15px';*/
+    flex-direction: column;
+    width: 40%;
+}
+
+.signUpBox {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    flex-direction: column;
+    width: 40%;
+}
