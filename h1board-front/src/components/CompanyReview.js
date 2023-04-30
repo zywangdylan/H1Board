@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Container, Button, Grid, Typography, Slider, Link } from '@mui/material';
+import { Button, Grid, Typography, Slider, Link } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { formatDuration } from '../helpers/formatter';
@@ -55,15 +55,6 @@ export default function CompanyReview(props) {
     <div>
       <div style={{margin: "2rem 0"}}>
         <Grid container spacing={3} style={{margin: "2rem 0"}}>
-        {/* <Grid item xs={4}>
-          <FormControlLabel
-            label='Explicit'
-            control={<Checkbox checked={explicit} onChange={(e) => setExplicit(e.target.checked)} />}
-          />
-        </Grid>
-        <Grid item xs={8}>
-
-        </Grid> */}
         <Grid item xs={6}>
           <p>Duration</p>
           <Slider
@@ -88,8 +79,6 @@ export default function CompanyReview(props) {
             valueLabelFormat={value => <div>{value / 1000000}</div>}
           />
         </Grid>
-        {/* TODO (TASK 24): add sliders for danceability, energy, and valence (they should be all in the same row of the Grid) */}
-        {/* Hint: consider what value xs should be to make them fit on the same row. Set max, min, and a reasonable step. Is valueLabelFormat is necessary? */}
         <Grid item xs={4}>
           <p>Danceability</p>
           <Slider

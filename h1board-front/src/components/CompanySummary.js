@@ -2,15 +2,10 @@ import React from "react";
 import { useEffect, useState } from "react";
 import {
   Button,
-  Checkbox,
-  Container,
-  FormControlLabel,
-  Grid,
-  Link,
-  Slider,
   TextField,
+  Typography,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { useParams } from "react-router-dom";
 
 import {
   BarChart,
@@ -22,14 +17,11 @@ import {
   LabelList,
 } from "recharts";
 
-// import { Bar } from 'react-chartjs-2';
-// import { Typography } from '@material-ui/core';
-
 const config = require("../config.json");
 
 export default function H1B(props) {
-  const company_id = props.companyInfo.companyId;
-  console.log("company id in this page is ", props.companyInfo.companyId);
+  const { company_id: param_company_id } = useParams();
+  const company_id = props.companyInfo.companyId || param_company_id;
 
   const [pageSize, setPageSize] = useState(10);
   const [companySummary, setCompanySummary] = useState([]);
@@ -130,7 +122,7 @@ export default function H1B(props) {
               culture_score: companySummaryWithId[0].culture,
             },
           ];
-        
+
           const searchlDataStats = [
             {
               name: companySummaryWithId[0].company_name + " overall stats",
@@ -147,14 +139,13 @@ export default function H1B(props) {
     setButtonClicked(true);
   };
 
-  const labelFormatter = (value, entry) => {
-    return `${entry}: ${value}`;
-  };
-
   return (
     <div>
       <div style={{ margin: "2rem 0" }}>
-        <h3>Company Description: {description}</h3>
+        <div>
+          <Typography variant="h4">Company Description</Typography>
+          <Typography variant="body1">{description}</Typography>
+        </div>
         {buttonClicked ? (
           <div>
             <BarChart
@@ -255,7 +246,7 @@ export default function H1B(props) {
           </div>
         )}
         <div>
-          <TextField 
+          <TextField
           label='Company Name' value={companySearch} onChange={(e) => setCompanySearch(e.target.value)} style={{ width: "100%", margin: "1rem 0" }}/>
         </div>
         <Button variant="contained" color="primary" onClick={handleButtonClick}>

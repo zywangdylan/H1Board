@@ -39,7 +39,7 @@ export default function CompaniesPage() {
         {/* Show the list of company and trigger handleListItemClick function when user click on one of the company */}
         {/* Pagination when listing companies */}
         {companies.map((company) =>
-          <List component="nav" aria-label="main mailbox folders">
+          <List component="nav" aria-label="main mailbox folders" key={company.companyId}>
               <ListItemButton
                 selected={selectedIndex === 0}
                 onClick={(event) => handleListItemClick(event, `${company.companyId}`)}
