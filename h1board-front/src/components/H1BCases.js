@@ -34,14 +34,14 @@ export default function H1B(props) {
       Promise.all([
         fetch(`http://${config.server_host}:${config.server_port}/h1bCases/${company_id}`)
           .then(res => {
-            if (res.status <= 200 || res.status >= 400) {
+            if (res.status < 200 || res.status >= 400) {
               throw new Error(res.statusText);
             }
             return res
           }),
         fetch(`http://${config.server_host}:${config.server_port}/h1bSummary/${company_id}`)
           .then(res => {
-            if (res.status <= 200 || res.status >= 400) {
+            if (res.status < 200 || res.status >= 400) {
               throw new Error(res.statusText);
             }
             return res

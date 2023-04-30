@@ -16,7 +16,7 @@ export default function CompanyPage() {
   const [tabValue, setTabValue] = useState(0);
   const currentNode = useRef(null);
 
-  // TODO: Switch between tabs when user clicks on a tab (Maybe using router to switch between componets?)
+  // Switch between tabs when user clicks on a tab
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
