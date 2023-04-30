@@ -4,6 +4,7 @@ import {
   Button,
   TextField,
   Typography,
+  Link
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 
@@ -16,16 +17,17 @@ import {
   Tooltip,
   LabelList,
 } from "recharts";
+import ErrorIcon from '@mui/icons-material/Error';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import { useNavigate } from "react-router-dom";
 
 const config = require("../config.json");
 
 export default function H1B(props) {
-  const { company_id: param_company_id } = useParams();
-  const company_id = props.companyInfo.companyId || param_company_id;
+  const { company_id } = useParams();
+  const navigate = useNavigate();
 
-  const [pageSize, setPageSize] = useState(10);
   const [companySummary, setCompanySummary] = useState([]);
-
   const [companySearch, setCompanySearch] = useState('');
 
   // overall stats
@@ -47,12 +49,18 @@ export default function H1B(props) {
   const [ratingData, setRatingData] = useState(null);
   const [statsData, setStatsData] = useState(null);
   const [buttonClicked, setButtonClicked] = useState(false);
+  const [noResult, setNoResult] = useState(false);
 
   useEffect(() => {
     fetch(
       `http://${config.server_host}:${config.server_port}/companySummary/${company_id}`
     )
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 404) {
+          throw new Error("Company not found");
+        }
+        return res.json();
+      })
       .then((resJson) => {
         const companySummaryWithId = resJson.map((summary) => ({
           id: summary.companyId,
@@ -78,6 +86,9 @@ export default function H1B(props) {
           setManagement(companySummaryWithId[0].management);
           setCulture(companySummaryWithId[0].culture);
         }
+      })
+      .catch((err) => {
+        setNoResult(true);
       });
   }, []);
 
@@ -141,118 +152,137 @@ export default function H1B(props) {
 
   return (
     <div>
-      <div style={{ margin: "2rem 0" }}>
-        <div>
-          <Typography variant="h4">Company Description</Typography>
-          <Typography variant="body1">{description}</Typography>
-        </div>
-        {buttonClicked ? (
-          <div>
-            <BarChart
-              width={1200}
-              height={300}
-              data={ratingData}
-              layout="vertical"
+      {
+        noResult ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'center'}}>
+            <ErrorIcon style={{ fontSize: 42 }} />
+            <Typography variant="h4">Company Not Found</Typography>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => {
+                navigate('/companies', { replace: true });
+              }}
+              style={{ marginTop: "1rem", display: 'flex', alignItems: 'center' }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" />
-              <Tooltip />
-              <Bar dataKey="average_rating" fill="#82ca9d">
-                <LabelList dataKey="average_rating" position="right" />
-              </Bar>
-              <Bar dataKey="work_life_balance" fill="#DFFF00">
-                <LabelList dataKey="work_life_balance" position="right" />
-              </Bar>
-              <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
-                <LabelList dataKey="job_security_and_advancement" position="right" />
-              </Bar>
-              <Bar dataKey="management_score" fill="#FF7F50">
-                <LabelList dataKey="management_score" position="right" />
-              </Bar>
-              <Bar dataKey="culture_score" fill="#DE3163">
-                <LabelList dataKey="culture_score" position="right" />
-              </Bar>
-            </BarChart>
-            <BarChart
-              width={1200}
-              height={300}
-              data={statsData}
-              layout="vertical"
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" />
-              <Tooltip />
-              <Bar dataKey="num_reviews" fill="#8884d8">
-                <LabelList dataKey="num_reviews" position="right" />
-              </Bar>
-              <Bar dataKey="num_locations" fill="#3f51b5">
-              <LabelList dataKey="num_locations" position="right" />
-              </Bar>
-              <Bar dataKey="num_jobs" fill="#283593">
-                <LabelList dataKey="num_jobs" position="right" />
-              </Bar>
-            </BarChart>
+              <KeyboardArrowLeftIcon /> Go Back to Companies Page
+            </Link>
           </div>
         ) : (
+        <div style={{ margin: "2rem 0" }}>
           <div>
-            <BarChart
-              width={1200}
-              height={300}
-              data={initialDataRatings}
-              layout="vertical"
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" />
-              <Tooltip />
-              <Bar dataKey="average_rating" fill="#82ca9d">
-                <LabelList dataKey="average_rating" position="right" />
-              </Bar>
-              <Bar dataKey="work_life_balance" fill="#DFFF00">
-                <LabelList dataKey="work_life_balance" position="right" />
-              </Bar>
-              <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
-                <LabelList dataKey="job_security_and_advancement" position="right" />
-              </Bar>
-              <Bar dataKey="management_score" fill="#FF7F50">
-                <LabelList dataKey="management_score" position="right" />
-              </Bar>
-              <Bar dataKey="culture_score" fill="#DE3163">
-                <LabelList dataKey="culture_score" position="right" />
-              </Bar>
-            </BarChart>
-            <BarChart
-              width={1200}
-              height={300}
-              data={initialDataStats}
-              layout="vertical"
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" />
-              <Tooltip />
-              <Bar dataKey="num_reviews" fill="#8884d8">
-                <LabelList dataKey="num_reviews" position="right" />
-              </Bar>
-              <Bar dataKey="num_locations" fill="#3f51b5">
-                <LabelList dataKey="num_locations" position="right" />
-              </Bar>
-              <Bar dataKey="num_jobs" fill="#283593">
-                <LabelList dataKey="num_jobs" position="right" />
-              </Bar>
-            </BarChart>
+            <Typography variant="h4">Company Description</Typography>
+            <Typography variant="body1">{description}</Typography>
           </div>
-        )}
-        <div>
-          <TextField
-          label='Company Name' value={companySearch} onChange={(e) => setCompanySearch(e.target.value)} style={{ width: "100%", margin: "1rem 0" }}/>
+          {buttonClicked ? (
+            <div>
+              <BarChart
+                width={1200}
+                height={300}
+                data={ratingData}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Bar dataKey="average_rating" fill="#82ca9d">
+                  <LabelList dataKey="average_rating" position="right" />
+                </Bar>
+                <Bar dataKey="work_life_balance" fill="#DFFF00">
+                  <LabelList dataKey="work_life_balance" position="right" />
+                </Bar>
+                <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
+                  <LabelList dataKey="job_security_and_advancement" position="right" />
+                </Bar>
+                <Bar dataKey="management_score" fill="#FF7F50">
+                  <LabelList dataKey="management_score" position="right" />
+                </Bar>
+                <Bar dataKey="culture_score" fill="#DE3163">
+                  <LabelList dataKey="culture_score" position="right" />
+                </Bar>
+              </BarChart>
+              <BarChart
+                width={1200}
+                height={300}
+                data={statsData}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Bar dataKey="num_reviews" fill="#8884d8">
+                  <LabelList dataKey="num_reviews" position="right" />
+                </Bar>
+                <Bar dataKey="num_locations" fill="#3f51b5">
+                <LabelList dataKey="num_locations" position="right" />
+                </Bar>
+                <Bar dataKey="num_jobs" fill="#283593">
+                  <LabelList dataKey="num_jobs" position="right" />
+                </Bar>
+              </BarChart>
+            </div>
+          ) : (
+            <div>
+              <BarChart
+                width={1200}
+                height={300}
+                data={initialDataRatings}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Bar dataKey="average_rating" fill="#82ca9d">
+                  <LabelList dataKey="average_rating" position="right" />
+                </Bar>
+                <Bar dataKey="work_life_balance" fill="#DFFF00">
+                  <LabelList dataKey="work_life_balance" position="right" />
+                </Bar>
+                <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
+                  <LabelList dataKey="job_security_and_advancement" position="right" />
+                </Bar>
+                <Bar dataKey="management_score" fill="#FF7F50">
+                  <LabelList dataKey="management_score" position="right" />
+                </Bar>
+                <Bar dataKey="culture_score" fill="#DE3163">
+                  <LabelList dataKey="culture_score" position="right" />
+                </Bar>
+              </BarChart>
+              <BarChart
+                width={1200}
+                height={300}
+                data={initialDataStats}
+                layout="vertical"
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis type="category" dataKey="name" />
+                <Tooltip />
+                <Bar dataKey="num_reviews" fill="#8884d8">
+                  <LabelList dataKey="num_reviews" position="right" />
+                </Bar>
+                <Bar dataKey="num_locations" fill="#3f51b5">
+                  <LabelList dataKey="num_locations" position="right" />
+                </Bar>
+                <Bar dataKey="num_jobs" fill="#283593">
+                  <LabelList dataKey="num_jobs" position="right" />
+                </Bar>
+              </BarChart>
+            </div>
+          )}
+          <div>
+            <TextField
+            label='Company Name' value={companySearch} onChange={(e) => setCompanySearch(e.target.value)} style={{ width: "100%", margin: "1rem 0" }}/>
+          </div>
+          <Button variant="contained" color="primary" onClick={handleButtonClick}>
+            Compare with Another Company
+          </Button>
         </div>
-        <Button variant="contained" color="primary" onClick={handleButtonClick}>
-          Compare with Another Company
-        </Button>
-      </div>
+        )
+      }
     </div>
   );
 }

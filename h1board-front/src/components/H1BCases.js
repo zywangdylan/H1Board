@@ -58,7 +58,6 @@ export default function H1B(props) {
         )
         .then(([dataCases, dataSummary]) => {
           const h1bCasesWithId = dataCases.map((cases) => ({ id : cases.h1bCaseId, ...cases}));
-          //   console.log("data: " + h1bCasesWithId);
           setCompanyCases(h1bCasesWithId);
 
           if (dataSummary.length > 0 && dataSummary[0].companyId) {
@@ -67,8 +66,6 @@ export default function H1B(props) {
           } else {
             setCompanySummary([]);
           }
-
-          console.log("company summary, ", companySummary);
         });
     }
 
@@ -84,7 +81,7 @@ export default function H1B(props) {
     ]
 
     const summaryColumns = [
-      {field: 'numApproved', width: 225, headerName: 'Cases Approved'},
+      { field: 'numApproved', width: 225, headerName: 'Cases Approved'},
       { field: 'totalCases',  width: 225, headerName: 'Total Cases' },
       { field: 'approvalRate', width: 225, headerName: 'Approval Rate'},
       { field: 'numFullTimes', width: 225, headerName: 'Fulltime Cases'},
@@ -155,6 +152,7 @@ export default function H1B(props) {
           rows={companySummary}
           columns={summaryColumns}
           pageSize={pageSize}
+          rowsPerPageOptions={[5, 10, 25]}
           onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           autoHeight
         />

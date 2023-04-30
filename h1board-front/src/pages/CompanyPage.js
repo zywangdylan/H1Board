@@ -28,17 +28,18 @@ export default function CompanyPage() {
   }, []);
 
   return (
-    <Container>
-      <Typography variant="h3" style={{marginTop: '2rem'}}>{ companyInfo.name }</Typography>
-      <Chip label={ companyInfo.industry } color="primary" />
+    <Container style={{display: 'flex', flexDirection:'column', minHeight: '70vh'}}>
+      <div style={{display: 'flex', flexDirection:'column'}}>
+        <Typography variant="h3" style={{marginTop: '2rem'}}>{ companyInfo.name }</Typography>
+        <Chip style={{maxWidth: '120px', marginTop: '0.5rem'}} label={ companyInfo.industry } color="primary" />
+      </div>
       <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
         <Tabs value={tabValue} onChange={handleChangeTab} aria-label="icon label tabs example">
-          <Tab icon={<ArticleIcon />} label="H1B Cases" />
           <Tab icon={<RateReviewIcon />} label="Company Summary" />
+          <Tab icon={<ArticleIcon />} label="H1B Cases" />
         </Tabs>
       </div>
-
-      {/* TODO: Create two components to demostrate 1. H1B Data (<H1B />) 2. Company Review (<CompanyReview />) */}
+      {/* Switching Tabs: Company Summary & H1B Case */}
       <SwitchTransition>
         <CSSTransition
           key={tabValue}
@@ -47,9 +48,9 @@ export default function CompanyPage() {
           nodeRef={currentNode}
           unmountOnExit
         >
-          <div>
-            { tabValue === 0 && <H1BCases companyCases = {companyInfo} /> }
-            { tabValue === 1 && <CompanySummary companyInfo={companyInfo} /> }
+          <div style={{flexGrow: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'center'}}>
+            { tabValue === 0 && <CompanySummary companyInfo={companyInfo} /> }
+            { tabValue === 1 && <H1BCases companyCases = {companyInfo} /> }
           </div>
         </CSSTransition>
       </SwitchTransition>
