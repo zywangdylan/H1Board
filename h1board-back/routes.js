@@ -4,6 +4,10 @@ const mysql = require('mysql');
 const config = require('./config.json');
 const bcrypt = require("bcrypt");
 const salt = "$2b$10$UdNqpnkWmAYDcyiP/QbYee";
+const jwt = require("jsonwebtoken");
+const { subscribe } = require("./server");
+const JWT_SECRET = config.JWT_SECRET;
+// const { v4: uuidv4 } = require('uuid');
 
 // Creates MySQL connection using database credential provided in config.json
 // Do not edit. If the connection fails, make sure to check that config.json is filled out correctly
@@ -12,7 +16,7 @@ const connection = mysql.createConnection({
   user: config.rds_user,
   password: config.rds_password,
   port: config.rds_port,
-  database: config.rds_db
+  database: config.rds_db,
 });
 connection.connect((err) => err && console.log(err));
 
@@ -22,26 +26,26 @@ const getOneUser = async function (req, res) {
   const id = req.params.id;
 
   // Check id is null or not
-  if (id == null) res.status(404).send('The user id is not provided');
+  if (id == null) res.status(404).send("The user id is not provided");
 
   // Write the query to retrieve the user's name and password
   const query = `
   SELECT name, password
   FROM AppUser
   WHERE userId = ${id}
-  `
+  `;
   connection.query(query, (err, data) => {
     if (err) {
       console.log(err);
       res.json({});
     } else if (data.length === 0) {
       console.log("User id ", String(id), " does not exist.");
-      res.status(404).send('User id does not exist.');
+      res.status(404).send("User id does not exist.");
     } else {
       res.json(data);
     }
   });
-}
+};
 
 // Route 2: POST /user/signup
 const createOneUser = async function (req, res) {
@@ -52,7 +56,7 @@ const createOneUser = async function (req, res) {
 
   // Check whether username or password is null or not
   if (username == null || password == null) {
-    res.status(404).send('Missing username or password.');
+    res.status(404).send("Missing username or password.");
   }
 
   // Use bcrypt to encrypt the password
@@ -73,7 +77,7 @@ const createOneUser = async function (req, res) {
       });
     }
   });
-}
+};
 
 // GET /companies
 const getAllCompanies = async function (req, res) {
@@ -96,7 +100,7 @@ const getAllCompanies = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // GET /companies/:id
 const getOneCompany = async function (req, res) {
@@ -104,26 +108,26 @@ const getOneCompany = async function (req, res) {
   const id = req.params.id;
 
   // Check id is null or not
-  if (id == null) res.status(404).send('The company id is not provided');
+  if (id == null) res.status(404).send("The company id is not provided");
 
   // Write the query to retrieve the company's name and industry
   const query = `
   SELECT *
   FROM Company
   WHERE companyId = ${id}
-  `
+  `;
   connection.query(query, (err, data) => {
     if (err) {
       console.log(err);
       res.json({});
     } else if (data.length === 0) {
       console.log("Company id ", String(id), " does not exist.");
-      res.status(404).send('Company id does not exist.');
+      res.status(404).send("Company id does not exist.");
     } else {
       res.json(data);
     }
   });
-}
+};
 
 // GET /company?name=
 const getCompanyByName = async function (req, res) {
@@ -175,12 +179,11 @@ const getCompaniesName = async function (req, res) {
 // Route 3: GET /popularCompanies
 const getPopularCompanies = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
-  const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
+  const caseStatus = req.query.caseStatus ? req.query.caseStatus : "";
   const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0.0;
-  const industry = req.query.industry ? req.query.industry : '';
+  const industry = req.query.industry ? req.query.industry : "";
 
-  const query
-    = `SELECT
+  const query = `SELECT
           c.name AS company_name,
           h.jobTitle,
           h.submitDate,
@@ -202,7 +205,7 @@ const getPopularCompanies = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // Route 4: GET /companies/review, obtain company name and review with certain number of reviews and range of rating.
 // Ordered in avg rating descending order
@@ -210,10 +213,11 @@ const getHRC_Review = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from parameters
   const reviewNum = req.query.reviewNum ? req.query.reviewNum : 0;
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
-  const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100.0;
+  const ratingCeiling = req.query.ratingCeiling
+    ? req.query.ratingCeiling
+    : 100.0;
 
-  const query
-    = `WITH
+  const query = `WITH
         company_review_stats AS (
           SELECT
             companyId,
@@ -241,7 +245,7 @@ const getHRC_Review = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // TODO: optimize slow query 5
 // Route 5: GET /companies/empSize
@@ -249,10 +253,11 @@ const getHRC_empSize = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from parameters
   const empSize = req.query.empSize ? req.query.empSize : 400;
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
-  const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100.0;
+  const ratingCeiling = req.query.ratingCeiling
+    ? req.query.ratingCeiling
+    : 100.0;
 
-  const query
-    = `WITH
+  const query = `WITH
         company_reviews AS (
           SELECT
             companyId,
@@ -298,7 +303,7 @@ const getHRC_empSize = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // TODO: optimize slow query 6
 // Route 6: GET /companies/h1bAndInterview
@@ -306,8 +311,7 @@ const getHRC_h1bAndInterview = async function (req, res) {
   const numInterviewReviews = req.query.numInterviewReviews ? req.query.numInterviewReviews : 0;
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
 
-  const query
-    = `WITH
+  const query = `WITH
         company_id as (
           SELECT
             IR.companyId
@@ -337,17 +341,18 @@ const getHRC_h1bAndInterview = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // Query 8
 // Route 7: GET /companies/workLifeBalance
 const getHRC_workLifeBal = async function (req, res) {
   const yearFloor = req.query.yearFloor ? req.query.yearFloor : 0;
   const yearCeiling = req.query.yearCeiling ? req.query.yearCeiling : 2025;
-  const avfWlbRatingFloor = req.query.avfWlbRatingFloor ? req.query.avfWlbRatingFloor : 0;
+  const avfWlbRatingFloor = req.query.avfWlbRatingFloor
+    ? req.query.avfWlbRatingFloor
+    : 0;
 
-  const query
-    = `With
+  const query = `With
         wlf_review AS (
           SELECT
             companyId,
@@ -381,16 +386,15 @@ const getHRC_workLifeBal = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // Route 8: GET /companies/ratingAndCaseStatus, query 10
 const getHRC_ratingAndCaseStatus = async function (req, res) {
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0;
   const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100;
-  const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
+  const caseStatus = req.query.caseStatus ? req.query.caseStatus : "";
 
-  const query
-    = `WITH
+  const query = `WITH
         company_rateLess3 AS (
           SELECT
             companyId,
@@ -421,7 +425,7 @@ const getHRC_ratingAndCaseStatus = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // Route 9: /companies/locationAndFulltime
 // List the places with the most companies (of a certain scale) offering fulltime jobs.
@@ -429,8 +433,7 @@ const getHRC_locationAndFulltime = async function (req, res) {
   const numCompanies = req.query.numCompanies ? req.query.numCompanies : 50;
   const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
-  const query
-    = `WITH
+  const query = `WITH
         fulltime_jobs AS (
           SELECT
             companyId,
@@ -481,15 +484,14 @@ const getHRC_locationAndFulltime = async function (req, res) {
       res.json(data);
     }
   });
-}
+};
 
 // Route 10: Search locations by large company size and H1B
 // GET /companies/locationAndApprovedH1b
 const getHRC_locateAndH1B = async function (req, res) {
   const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
-  const query
-    = `WITH companies_10000 AS (
+  const query = `WITH companies_10000 AS (
           SELECT DISTINCT c.companyId FROM Company c
           INNER JOIN H1bCase h ON c.companyId = h.companyId
           WHERE h.caseStatus = 'C'
@@ -533,8 +535,7 @@ const getHRC_locateAndH1B = async function (req, res) {
 const getHRC_fullTimeAndApprovedH1B = async function (req, res) {
   const isFullTime = req.query.isFullTime ? req.query.isFullTime : 0;
 
-  const query
-    = `With approvedH1B_part_time AS (
+  const query = `With approvedH1B_part_time AS (
         SELECT
           DISTINCT H.companyId,
           H.jobId,
@@ -584,8 +585,7 @@ const getHRC_industryWithApprovedH1B = async function (req, res) {
   const numIndustries = req.query.numIndustries ? req.query.numIndustries : 5;
   const sinceYear = req.query.sinceYear ? req.query.sinceYear : 2012;
 
-  const query
-    = `WITH
+  const query = `WITH
         h1b_cases AS (
           SELECT
             companyId,
@@ -628,6 +628,148 @@ const getHRC_industryWithApprovedH1B = async function (req, res) {
 // GET /
 const welcome = async function (req, res) {
   res.status(200).send('welcome to the backend.');
+};
+
+// Route 14: H1B summary
+const getOneCompanyH1bSummary = async function (req, res) {
+  // Retrieve companyId from the parameters
+  const id = req.params.id;
+  const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0;
+
+  // Check id is null or not
+  if (id == null) res.status(404).send("The company id is not provided");
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT
+    companyId,
+    SUM(IF(caseStatus = 'C', 1, 0)) as numApproved,
+    SUM(IF(wageFrom > ${wageFrom}, 1, 0)) as numWagesAbove,
+    COUNT(*) as totalCases
+  FROM H1bCase
+  WHERE companyId = ${id}
+  `;
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Company id ", String(id), " does not exist.");
+      res.status(404).send("Company id does not exist.");
+    } else {
+      res.json(data);
+    }
+  });
+};
+
+// Route 15: All H1B cases of a particular company
+const getOneCompanyH1bCases = async function (req, res) {
+  const id = req.params.id;
+  var caseStatus = req.query.caseStatus ? req.query.caseStatus : "";
+  var fullTime = req.query.fullTime ? req.query.fullTime : "";
+  var dateFloor = req.query.submitDate
+    ? convert(req.query.submitDate)
+    : "2009-04-15";
+  var dateCeil = req.query.decisionDate
+    ? convert(req.query.decisionDate)
+    : "2017-09-30";
+
+  caseStatus = caseStatus == "false" ? "CW" : "C";
+  if (fullTime != null) {
+    fullTime = fullTime.trim() == "false" ? 0 : 1;
+  }
+
+  if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+  if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
+
+  // Check id is null or not
+  if (id == null) res.status(404).send("The company id is not provided");
+
+  const query = `
+    SELECT DISTINCT h1bCaseId, empName, jobTitle, fulltime, caseStatus, caseYear, Date_Format(submitDate,'%Y-%m-%d') As submitDate, Date_Format(decisionDate,'%Y-%m-%d') As decisionDate, wageFrom
+    FROM H1bCase
+    WHERE companyId = ${id}
+      AND fulltime = ${fullTime}
+      AND caseStatus = '${caseStatus}'
+      AND submitDate > '${dateFloor}'
+      AND decisionDate < '${dateCeil}'
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      if (data.length === 0) {
+        res.status(404).send("Company h1b case data does not exist.");
+      } else {
+        res.json(data);
+      }
+    }
+  });
+};
+
+// Route 16: Get overall rating & summary of one company
+const getOneCompanySummary = async function (req, res) {
+  const id = req.params.id;
+  const companyName = req.query.companyName ? req.query.companyName : '';
+  // const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
+  // const ratingCeil = req.query.ratingCeil ? req.query.ratingCeil : 5.0;
+  // const empSize = req.query.empSize ? req.query.empSize : 20;
+
+  // Check id is null or not
+  if (id == null) res.status(404).send("The company id is not provided");
+
+  const query = `
+    WITH
+    company_reviews AS (
+      SELECT companyId, AVG(overallRating) AS avg_rating, COUNT(*) AS num_reviews, textReview, workLifeBalance, compensationOrBenefits, jobSecurityOrAdvance, management, culture
+      FROM Review
+      GROUP BY companyId),
+    company_stats AS (
+      SELECT companyId,COUNT(DISTINCT jobId) AS num_jobs,COUNT(DISTINCT locationId) AS num_locations
+      FROM HasRole
+      GROUP BY companyId)
+    SELECT c.name AS company_name,
+      Industry.industry,
+      company_reviews.avg_rating,
+      company_reviews.num_reviews,
+      company_reviews.textReview,
+      company_reviews.workLifeBalance,
+      company_reviews.compensationOrBenefits,
+      company_reviews.jobSecurityOrAdvance,
+      company_reviews.management,
+      company_reviews.culture,
+      company_stats.num_locations,
+      company_stats.num_jobs,
+      company_stats.companyId
+    FROM (SELECT name, industryId, companyId FROM Company) c
+      JOIN Industry ON c.industryId = Industry.industryId
+      JOIN company_reviews ON c.companyId = company_reviews.companyId
+      JOIN company_stats ON c.companyId = company_stats.companyId
+    WHERE (c.companyId = ${id} OR ${id} = '') AND (c.name = '${companyName}' OR '${companyName}' = '')
+    ORDER BY company_reviews.avg_rating DESC, company_reviews.num_reviews DESC;
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      if (data.length === 0) {
+        res.status(404).send("Company id does not exist.");
+      } else {
+        res.json(data);
+      }
+    }
+  });
+};
+
+function convert(str) {
+  var date = new Date(str),
+    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+    day = ("0" + date.getDate()).slice(-2);
+  return [date.getFullYear(), mnth, day].join("-");
 }
 
 // Routes 14: Signin user
@@ -687,5 +829,8 @@ module.exports = {
   getHRC_fullTimeAndApprovedH1B,
   getHRC_industryWithApprovedH1B,
   welcome,
-  signinUser
-}
+  signinUser,
+  getOneCompanyH1bSummary,
+  getOneCompanyH1bCases,
+  getOneCompanySummary
+};

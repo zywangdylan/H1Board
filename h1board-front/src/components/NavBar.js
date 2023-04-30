@@ -1,7 +1,7 @@
 import { AppBar, Container, Toolbar, Typography, Box, Button, Modal, Alert } from '@mui/material'
 import { NavLink } from 'react-router-dom';
 import { Home, Logout } from '@mui/icons-material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import LoginModal from './Modal/LoginModal';
@@ -54,20 +54,25 @@ export default function NavBar(props) {
   const navigate = useNavigate();
   const [openLogin, setOpenLogin] = useState(false);
   const [openSignup, setOpenSignup] = useState(false);
-  const [loginAlert, setLoginAlert] = useState(props.setLoginAlert || false);
+  const [loginAlert, setLoginAlert] = useState(false);
   const [signupAlert, setSignupAlert] = useState(false);
   const [signupResult, setSignupResult] = useState(null);
-  const [user, setUser] = useState(localStorage.getItem('UID') || null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (localStorage.getItem('UID') !== null) {
+      setUser(localStorage.getItem('UID'));
+    }
+    setLoginAlert(props.setLoginAlert);
+  }, [])
 
   const onClickLogout = async () => {
-    // e.preventDefault();
     try {
       await logoutUser();
       localStorage.removeItem('user_data');
       localStorage.removeItem('UID');
       setUser(null);
       navigate('/');
-      navigate(0);
     } catch (err) {
       alert('Error Logging Out, please try again');
     }
