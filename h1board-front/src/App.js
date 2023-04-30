@@ -6,13 +6,10 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { useEffect, useState } from 'react';
 import jwt_decode from "jwt-decode";
 
-import React, { useState } from 'react';
 import NavBar from './components/NavBar';
 import HomePage from './pages/HomePage';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
-import LogoutComponent from './components/Logout/Logout';
-import { gridColumnGroupingSelector } from "@mui/x-data-grid";
 import LogoutComponent from './components/Logout/Logout';
 
 // createTheme enables you to customize the look and feel of your app past the default
@@ -34,7 +31,7 @@ export default function App() {
 
   const handleCallbackres = (res) => {
     const userObject = jwt_decode(res.credential)
-    console.log(userObject)
+
   }
 
   useEffect(() => {
