@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import { CssBaseline, ThemeProvider } from '@mui/material'
+import { CssBaseline, ThemeProvider, Alert } from '@mui/material'
 import { blue, yellow } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
@@ -24,14 +24,25 @@ export const theme = createTheme({
 export default function App() {
   const location = useLocation();
   const [userId, setUserId] = useState(localStorage.getItem('UID') || null);
+  const [loginAlert, setLoginAlert] = useState(false);
 
   const userStateChanger = (title) => {
     setUserId(title);
   }
 
-  const handleCallbackres = (res) => {
+  const handleCallbackres = async (res) => {
     const userObject = jwt_decode(res.credential)
-
+    console.log(userObject)
+    if (userObject.sub !== null) {
+      await localStorage.setItem("user_data", JSON.stringify(userObject));
+      await localStorage.setItem("UID", userObject.sub);
+      userStateChanger(userObject.sub);
+      localStorage.setItem('limit', 3);
+      setLoginAlert(true);
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 2000);
+    }
   }
 
   useEffect(() => {
@@ -45,7 +56,12 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <NavBar userStateChanger={userStateChanger} />
+      <NavBar userStateChanger={userStateChanger} setLoginAlert={setLoginAlert} />
+      {
+        loginAlert ? (
+          <Alert severity="success">Login Successfully! 🥳</Alert>
+        ) : null
+      }
       <TransitionGroup component={null}>
         <CSSTransition
           timeout={300}
