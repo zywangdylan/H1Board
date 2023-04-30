@@ -210,6 +210,14 @@ webapp.get('/h1bCases/:id', routes.getOneCompanyH1bCases);
  */
 webapp.get('/companySummary/:id', routes.getOneCompanySummary);
 
+/**
+ * Get the location and number of companies in that location
+ *
+ * @param {id}
+ * @return {location, num_companies } on success
+ */
+webapp.get('/locations', routes.getLocationAndNumCompanies);
+
 webapp.listen(config.server_port, () => {
   console.log(`Server running at http://${config.server_host}:${config.server_port}/`)
 });
