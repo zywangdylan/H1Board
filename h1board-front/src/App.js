@@ -6,16 +6,14 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { useEffect, useState } from 'react';
 import jwt_decode from "jwt-decode";
 
+import React, { useState } from 'react';
 import NavBar from './components/NavBar';
 import HomePage from './pages/HomePage';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
-<<<<<<< Updated upstream
-import AlbumInfoPage from './pages/AlbumInfoPage'
-=======
 import LogoutComponent from './components/Logout/Logout';
 import { gridColumnGroupingSelector } from "@mui/x-data-grid";
->>>>>>> Stashed changes
+import LogoutComponent from './components/Logout/Logout';
 
 // createTheme enables you to customize the look and feel of your app past the default
 // in this case, we only change the color scheme
@@ -28,6 +26,11 @@ export const theme = createTheme({
 
 export default function App() {
   const location = useLocation();
+  const [userId, setUserId] = useState(localStorage.getItem('UID') || null);
+
+  const userStateChanger = (title) => {
+    setUserId(title);
+  }
 
   const handleCallbackres = (res) => {
     const userObject = jwt_decode(res.credential)
@@ -45,7 +48,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <NavBar/>
+      <NavBar userStateChanger={userStateChanger} />
       <TransitionGroup component={null}>
         <CSSTransition
           timeout={300}
@@ -54,7 +57,7 @@ export default function App() {
         >
           <Routes location={location}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
+            <Route path="/logout" element={<LogoutComponent />} />
             <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/company/:company_id" element={<CompanyPage />} />
           </Routes>
