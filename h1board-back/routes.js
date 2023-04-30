@@ -671,11 +671,6 @@ const getOneCompanyH1bCases = async function (req, res) {
 const getOneCompanySummary = async function (req, res) {
   const id = req.params.id;
   const companyName = req.query.companyName ? req.query.companyName : '';
-  console.log("id: " + id);
-  console.log("companyName: " + companyName);
-  // const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
-  // const ratingCeil = req.query.ratingCeil ? req.query.ratingCeil : 5.0;
-  // const empSize = req.query.empSize ? req.query.empSize : 20;
 
   // Check id is null or not
   if (id == null) res.status(404).send("The company id is not provided");
@@ -722,6 +717,51 @@ const getOneCompanySummary = async function (req, res) {
   });
 };
 
+// Route 17: Get locations and number of companies in that location
+const getLocationAndNumCompanies = async function(req, res) {
+  var caseStatus = req.query.caseStatus ? req.query.caseStatus : 'C';
+  var empSize = req.query.empSize ? req.query.empSize : '10,000+';
+
+  empSize = empSize.trim() == "10,000" ? "10,000+" : empSize;
+  caseStatus = caseStatus == "false" ? "CW" : "C";
+
+  const query = `
+    WITH companies AS (SELECT DISTINCT c.companyId
+      FROM Company c
+             INNER JOIN H1bCase h ON c.companyId = h.companyId
+      WHERE h.caseStatus = '${caseStatus}'
+        AND c.employeeSize = '${empSize}'),
+
+      location_ids AS (SELECT locationId
+        FROM HasRole
+        WHERE companyId IN (SELECT companyId FROM companies)),
+
+      locations AS (SELECT locationId, city, state
+        FROM Location
+        WHERE locationId IN (SELECT locationId FROM location_ids)),
+
+      companyCountAtLocation AS (SELECT city, state, COUNT(*) AS num_companies
+           FROM locations
+                    JOIN HasRole ON locations.locationId = HasRole.locationId
+                    JOIN companies ON HasRole.companyId = companies.companyId
+           GROUP BY city, state)
+
+    SELECT CONCAT(city, ', ', state) AS location,
+    num_companies
+    FROM companyCountAtLocation
+    ORDER BY num_companies DESC
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      console.log(data);
+      res.json(data);
+    }
+  });
+}
+
 function convert(str) {
   var date = new Date(str),
     mnth = ("0" + (date.getMonth() + 1)).slice(-2),
@@ -747,5 +787,6 @@ module.exports = {
   welcome,
   getOneCompanyH1bSummary,
   getOneCompanyH1bCases,
-  getOneCompanySummary
+  getOneCompanySummary,
+  getLocationAndNumCompanies
 };
