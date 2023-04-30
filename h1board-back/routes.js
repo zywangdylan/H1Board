@@ -76,7 +76,7 @@ const createOneUser = async function (req, res) {
 }
 
 // GET /companies
-const getAllCompanies = async function(req, res) {
+const getAllCompanies = async function (req, res) {
   // GET all companies data with pagination
   const pageNum = req.query.pageNum ? req.query.pageNum : 1;
   const pageSize = req.query.pageSize ? req.query.pageSize : 10;
@@ -99,7 +99,7 @@ const getAllCompanies = async function(req, res) {
 }
 
 // GET /companies/:id
-const getOneCompany = async function(req, res) {
+const getOneCompany = async function (req, res) {
   // Retrieve companyId from the parameters
   const id = req.params.id;
 
@@ -119,6 +119,53 @@ const getOneCompany = async function(req, res) {
     } else if (data.length === 0) {
       console.log("Company id ", String(id), " does not exist.");
       res.status(404).send('Company id does not exist.');
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// GET /company?name=
+const getCompanyByName = async function (req, res) {
+  // Retrieve companyName from the parameters
+  const name = req.query.name;
+
+  // Check id is null or not
+  if (name == null) res.status(404).send('The company name is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT companyId
+  FROM Company
+  WHERE name = '${name}'
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Company name ", String(name), " does not exist.");
+      res.status(404).send('Company name does not exist.');
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// GET /companiesName
+const getCompaniesName = async function (req, res) {
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT DISTINCT name
+  FROM Company
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Can't get companies name");
+      res.status(404).send("Can't get companies name.");
     } else {
       res.json(data);
     }
@@ -627,6 +674,8 @@ module.exports = {
   createOneUser,
   getAllCompanies,
   getOneCompany,
+  getCompanyByName,
+  getCompaniesName,
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,
