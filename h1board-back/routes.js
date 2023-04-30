@@ -639,13 +639,13 @@ const getOneCompanyH1bCases = async function (req, res) {
   if (id == null) res.status(404).send("The company id is not provided");
 
   const query = `
-  SELECT DISTINCT h1bCaseId, empName, jobTitle, fulltime, caseStatus, caseYear, Date_Format(submitDate,'%Y-%m-%d') As submitDate, Date_Format(decisionDate,'%Y-%m-%d') As decisionDate, wageFrom
-  FROM H1bCase
-  WHERE companyId = ${id}
-    AND fulltime = ${fullTime}
-    AND caseStatus = '${caseStatus}'
-    AND submitDate > '${dateFloor}'
-    AND decisionDate < '${dateCeil}'
+    SELECT DISTINCT h1bCaseId, empName, jobTitle, fulltime, caseStatus, caseYear, Date_Format(submitDate,'%Y-%m-%d') As submitDate, Date_Format(decisionDate,'%Y-%m-%d') As decisionDate, wageFrom
+    FROM H1bCase
+    WHERE companyId = ${id}
+      AND fulltime = ${fullTime}
+      AND caseStatus = '${caseStatus}'
+      AND submitDate > '${dateFloor}'
+      AND decisionDate < '${dateCeil}'
   `;
 
   connection.query(query, (err, data) => {
@@ -653,8 +653,11 @@ const getOneCompanyH1bCases = async function (req, res) {
       console.log(err);
       res.json({});
     } else {
-      console.log(data);
-      res.json(data);
+      if (data.length === 0) {
+        res.status(404).send("Company h1b case data does not exist.");
+      } else {
+        res.json(data);
+      }
     }
   });
 };
@@ -663,8 +666,6 @@ const getOneCompanyH1bCases = async function (req, res) {
 const getOneCompanySummary = async function (req, res) {
   const id = req.params.id;
   const companyName = req.query.companyName ? req.query.companyName : '';
-  console.log("id: " + id);
-  console.log("companyName: " + companyName);
   // const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
   // const ratingCeil = req.query.ratingCeil ? req.query.ratingCeil : 5.0;
   // const empSize = req.query.empSize ? req.query.empSize : 20;
@@ -673,34 +674,34 @@ const getOneCompanySummary = async function (req, res) {
   if (id == null) res.status(404).send("The company id is not provided");
 
   const query = `
-  WITH
-  company_reviews AS (
-    SELECT companyId, AVG(overallRating) AS avg_rating, COUNT(*) AS num_reviews, textReview, workLifeBalance, compensationOrBenefits, jobSecurityOrAdvance, management, culture
-    FROM Review
-    GROUP BY companyId),
-  company_stats AS (
-    SELECT companyId,COUNT(DISTINCT jobId) AS num_jobs,COUNT(DISTINCT locationId) AS num_locations
-    FROM HasRole
-    GROUP BY companyId)
-  SELECT c.name AS company_name,
-    Industry.industry,
-    company_reviews.avg_rating,
-    company_reviews.num_reviews,
-    company_reviews.textReview,
-    company_reviews.workLifeBalance,
-    company_reviews.compensationOrBenefits,
-    company_reviews.jobSecurityOrAdvance,
-    company_reviews.management,
-    company_reviews.culture,
-    company_stats.num_locations,
-    company_stats.num_jobs,
-    company_stats.companyId
-  FROM (SELECT name, industryId, companyId FROM Company) c
-    JOIN Industry ON c.industryId = Industry.industryId
-    JOIN company_reviews ON c.companyId = company_reviews.companyId
-    JOIN company_stats ON c.companyId = company_stats.companyId
-  WHERE (c.companyId = ${id} OR ${id} = '') AND (c.name = '${companyName}' OR '${companyName}' = '')
-  ORDER BY company_reviews.avg_rating DESC, company_reviews.num_reviews DESC;
+    WITH
+    company_reviews AS (
+      SELECT companyId, AVG(overallRating) AS avg_rating, COUNT(*) AS num_reviews, textReview, workLifeBalance, compensationOrBenefits, jobSecurityOrAdvance, management, culture
+      FROM Review
+      GROUP BY companyId),
+    company_stats AS (
+      SELECT companyId,COUNT(DISTINCT jobId) AS num_jobs,COUNT(DISTINCT locationId) AS num_locations
+      FROM HasRole
+      GROUP BY companyId)
+    SELECT c.name AS company_name,
+      Industry.industry,
+      company_reviews.avg_rating,
+      company_reviews.num_reviews,
+      company_reviews.textReview,
+      company_reviews.workLifeBalance,
+      company_reviews.compensationOrBenefits,
+      company_reviews.jobSecurityOrAdvance,
+      company_reviews.management,
+      company_reviews.culture,
+      company_stats.num_locations,
+      company_stats.num_jobs,
+      company_stats.companyId
+    FROM (SELECT name, industryId, companyId FROM Company) c
+      JOIN Industry ON c.industryId = Industry.industryId
+      JOIN company_reviews ON c.companyId = company_reviews.companyId
+      JOIN company_stats ON c.companyId = company_stats.companyId
+    WHERE (c.companyId = ${id} OR ${id} = '') AND (c.name = '${companyName}' OR '${companyName}' = '')
+    ORDER BY company_reviews.avg_rating DESC, company_reviews.num_reviews DESC;
   `;
 
   connection.query(query, (err, data) => {
@@ -708,8 +709,11 @@ const getOneCompanySummary = async function (req, res) {
       console.log(err);
       res.json({});
     } else {
-      console.log(data);
-      res.json(data);
+      if (data.length === 0) {
+        res.status(404).send("Company id does not exist.");
+      } else {
+        res.json(data);
+      }
     }
   });
 };
