@@ -159,12 +159,6 @@ const getCompanyByName = async function (req, res) {
 
 // GET /companiesName
 const getCompaniesName = async function (req, res) {
-  // Retrieve companyName from the parameters
-  // const name = req.query.name;
-
-  // Check id is null or not
-  // if (name == null) res.status(404).send('The company name is not provided');
-
   // Write the query to retrieve the company's name and industry
   const query = `
   SELECT DISTINCT name
