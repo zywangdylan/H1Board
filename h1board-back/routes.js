@@ -2,9 +2,8 @@
 
 const mysql = require('mysql');
 const config = require('./config.json');
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = config.JWT_SECRET;
-// const { v4: uuidv4 } = require('uuid');
+const bcrypt = require("bcrypt");
+const salt = "$2b$10$UdNqpnkWmAYDcyiP/QbYee";
 
 // Creates MySQL connection using database credential provided in config.json
 // Do not edit. If the connection fails, make sure to check that config.json is filled out correctly
@@ -18,7 +17,7 @@ const connection = mysql.createConnection({
 connection.connect((err) => err && console.log(err));
 
 // Route 1: GET /user/:id
-const getOneUser = async function(req, res) {
+const getOneUser = async function (req, res) {
   // Retrieve userId from the parameters
   const id = req.params.id;
 
@@ -44,13 +43,11 @@ const getOneUser = async function(req, res) {
   });
 }
 
-// Route 2: POST /user
-const createOneUser = async function(req, res) {
+// Route 2: POST /user/signup
+const createOneUser = async function (req, res) {
   // Retrieve the name and password from the request body
   const username = req.body.name;
   const password = req.body.password;
-  // could use UUID? or other way to generate unique BigInt ID
-  // const userId = uuidv4();
   const userId = Date.now() + Math.floor(Math.random() * 100);
 
   // Check whether username or password is null or not
@@ -58,10 +55,8 @@ const createOneUser = async function(req, res) {
     res.status(404).send('Missing username or password.');
   }
 
-  // Generate jwt token and this token expired in 5 minutes
-  const token = jwt.sign({
-    password: password,
-  }, JWT_SECRET, { expiresIn: '300s' });
+  // Use bcrypt to encrypt the password
+  const token = bcrypt.hashSync(req.body.password, salt);
 
   // Insert one app user into the database
   const query = `INSERT INTO AppUser VALUES(${userId}, '${username}', '${token}')`;
@@ -131,7 +126,7 @@ const getOneCompany = async function(req, res) {
 }
 
 // Route 3: GET /popularCompanies
-const getPopularCompanies = async function(req, res) {
+const getPopularCompanies = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
   const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0.0;
@@ -164,7 +159,7 @@ const getPopularCompanies = async function(req, res) {
 
 // Route 4: GET /companies/review, obtain company name and review with certain number of reviews and range of rating.
 // Ordered in avg rating descending order
-const getHRC_Review = async function(req, res) {
+const getHRC_Review = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from parameters
   const reviewNum = req.query.reviewNum ? req.query.reviewNum : 0;
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
@@ -203,7 +198,7 @@ const getHRC_Review = async function(req, res) {
 
 // TODO: optimize slow query 5
 // Route 5: GET /companies/empSize
-const getHRC_empSize = async function(req, res) {
+const getHRC_empSize = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from parameters
   const empSize = req.query.empSize ? req.query.empSize : 400;
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0.0;
@@ -260,7 +255,7 @@ const getHRC_empSize = async function(req, res) {
 
 // TODO: optimize slow query 6
 // Route 6: GET /companies/h1bAndInterview
-const getHRC_h1bAndInterview = async function(req, res) {
+const getHRC_h1bAndInterview = async function (req, res) {
   const numInterviewReviews = req.query.numInterviewReviews ? req.query.numInterviewReviews : 0;
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
 
@@ -299,7 +294,7 @@ const getHRC_h1bAndInterview = async function(req, res) {
 
 // Query 8
 // Route 7: GET /companies/workLifeBalance
-const getHRC_workLifeBal = async function(req, res) {
+const getHRC_workLifeBal = async function (req, res) {
   const yearFloor = req.query.yearFloor ? req.query.yearFloor : 0;
   const yearCeiling = req.query.yearCeiling ? req.query.yearCeiling : 2025;
   const avfWlbRatingFloor = req.query.avfWlbRatingFloor ? req.query.avfWlbRatingFloor : 0;
@@ -342,7 +337,7 @@ const getHRC_workLifeBal = async function(req, res) {
 }
 
 // Route 8: GET /companies/ratingAndCaseStatus, query 10
-const getHRC_ratingAndCaseStatus = async function(req, res) {
+const getHRC_ratingAndCaseStatus = async function (req, res) {
   const ratingFloor = req.query.ratingFloor ? req.query.ratingFloor : 0;
   const ratingCeiling = req.query.ratingCeiling ? req.query.ratingCeiling : 100;
   const caseStatus = req.query.caseStatus ? req.query.caseStatus : '';
@@ -383,7 +378,7 @@ const getHRC_ratingAndCaseStatus = async function(req, res) {
 
 // Route 9: /companies/locationAndFulltime
 // List the places with the most companies (of a certain scale) offering fulltime jobs.
-const getHRC_locationAndFulltime = async function(req, res) {
+const getHRC_locationAndFulltime = async function (req, res) {
   const numCompanies = req.query.numCompanies ? req.query.numCompanies : 50;
   const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
@@ -443,7 +438,7 @@ const getHRC_locationAndFulltime = async function(req, res) {
 
 // Route 10: Search locations by large company size and H1B
 // GET /companies/locationAndApprovedH1b
-const getHRC_locateAndH1B = async function(req, res) {
+const getHRC_locateAndH1B = async function (req, res) {
   const numLocations = req.query.numLocations ? req.query.numLocations : 10;
 
   const query
@@ -488,7 +483,7 @@ const getHRC_locateAndH1B = async function(req, res) {
 
 // Route 11: Search jobs by H1B
 // GET /companies/fullTimeAndApprovedH1B
-const getHRC_fullTimeAndApprovedH1B = async function(req, res) {
+const getHRC_fullTimeAndApprovedH1B = async function (req, res) {
   const isFullTime = req.query.isFullTime ? req.query.isFullTime : 0;
 
   const query
@@ -538,7 +533,7 @@ const getHRC_fullTimeAndApprovedH1B = async function(req, res) {
 
 // Route 12: Search industry by H1B
 // GET /highReviewCompanies/:numIndustries
-const getHRC_industryWithApprovedH1B = async function(req, res) {
+const getHRC_industryWithApprovedH1B = async function (req, res) {
   const numIndustries = req.query.numIndustries ? req.query.numIndustries : 5;
   const sinceYear = req.query.sinceYear ? req.query.sinceYear : 2012;
 
@@ -584,8 +579,47 @@ const getHRC_industryWithApprovedH1B = async function(req, res) {
 
 // Routes 13: Backend welcome page
 // GET /
-const welcome = async function(req, res) {
+const welcome = async function (req, res) {
   res.status(200).send('welcome to the backend.');
+}
+
+// Routes 14: Signin user
+// POST /user/signin
+const signinUser = async function (req, res) {
+
+  try {
+    const user = {
+      name: req.body.name,
+      password: req.body.password
+    };
+
+    // Use bcrypt to encrypt the password
+    const token = bcrypt.hashSync(req.body.password, salt);
+
+    // Write the query to retrieve the user with the provided name and password
+    const query = `
+      SELECT *
+      FROM AppUser
+      WHERE name = "${user.name}" AND password = "${token}"
+      LIMIT 1
+      `
+
+    connection.query(query, (err, data) => {
+      if (err) {
+        console.log(err);
+        res.json({});
+      } else if (data.length === 0) {
+        console.log("User name ", String(user.name), " or User password ", String(user.password), " is incorrect.");
+        res.status(404).send('User name or User password is incorrect.');
+      } else {
+        res.json(data);
+      }
+    });
+
+  } catch (err) {
+    console.log(err.message);
+    res.status(401).send({ message: err.message })
+  }
 }
 
 module.exports = {
@@ -603,5 +637,6 @@ module.exports = {
   getHRC_locateAndH1B,
   getHRC_fullTimeAndApprovedH1B,
   getHRC_industryWithApprovedH1B,
-  welcome
+  welcome,
+  signinUser
 }
