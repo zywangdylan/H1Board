@@ -130,37 +130,6 @@ const getOneCompany = async function(req, res) {
   });
 }
 
-// GET /companies/:id
-const getOneCompanyH1bSummary = async function(req, res) {
-  // Retrieve companyId from the parameters
-  const id = req.params.id;
-  const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0;
-
-  // Check id is null or not
-  if (id == null) res.status(404).send('The company id is not provided');
-
-  // Write the query to retrieve the company's name and industry
-  const query = `
-  SELECT 
-    companyId, 
-    SUM(IF(caseStatus = 'C', 1, 0)) as numApproved,
-    COUNT(*) as totalCases
-  FROM H1bCase
-  WHERE companyId = ${id} AND wageFrom >= ${wageFrom}
-  `
-  connection.query(query, (err, data) => {
-    if (err) {
-      console.log(err);
-      res.json({});
-    } else if (data.length === 0) {
-      console.log("Company id ", String(id), " does not exist.");
-      res.status(404).send('Company id does not exist.');
-    } else {
-      res.json(data);
-    }
-  });
-}
-
 // Route 3: GET /popularCompanies
 const getPopularCompanies = async function(req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
@@ -265,6 +234,7 @@ const getHRC_empSize = async function(req, res) {
           GROUP BY companyId)
         SELECT
           Company.name AS company_name,
+          Company.company_id, 
           Industry.industry,
           company_reviews.avg_rating,
           company_reviews.num_reviews,
@@ -619,12 +589,153 @@ const welcome = async function(req, res) {
   res.status(200).send('welcome to the backend.');
 }
 
+function convert(str) {
+  var date = new Date(str),
+    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+    day = ("0" + date.getDate()).slice(-2);
+  return [date.getFullYear(), mnth, day].join("-");
+}
+
+// Route 14
+// GET /h1bSummary/:company_id
+const getOneCompanyH1bSummary = async function(req, res) {
+  // Retrieve companyId from the parameters
+  const id = req.params.id;
+
+  var dateFloor = req.query.submitDate
+    ? convert(req.query.submitDate)
+    : "2009-04-15";
+  var dateCeil = req.query.decisionDate
+    ? convert(req.query.decisionDate)
+    : "2017-09-30";
+
+
+  if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+  if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
+
+  // Check id is null or not
+  if (id == null) res.status(404).send('The company id is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT 
+    companyId, 
+    SUM(IF(caseStatus = 'C', 1, 0)) as numApproved,
+    COUNT(*) as totalCases,
+    SUM(fulltime) as numFullTimes,
+    AVG(DATEDIFF(decisionDate, submitDate)) as avgProcessTimeInDate,
+    CONCAT((SUM(IF(caseStatus = 'C', 1, 0)) * 100 DIV COUNT(*)), '%') as approvalRate
+  FROM H1bCase
+  WHERE companyId = ${id}     
+        AND submitDate > '${dateFloor}'
+        AND decisionDate < '${dateCeil}'
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      console.log(data);
+      res.json(data);
+    }
+  });
+}
+
+// Route 15: All H1B cases of a particular company
+const getOneCompanyH1bCases = async function (req, res) {
+  const id = req.params.id;
+  var caseStatus = req.query.caseStatus ? req.query.caseStatus : "";
+  var fullTime = req.query.fullTime ? req.query.fullTime : "";
+  var dateFloor = req.query.submitDate
+    ? convert(req.query.submitDate)
+    : "2009-04-15";
+  var dateCeil = req.query.decisionDate
+    ? convert(req.query.decisionDate)
+    : "2017-09-30";
+
+  caseStatus = caseStatus == "false" ? "CW" : "C";
+  if (fullTime != null) {
+    fullTime = fullTime.trim() == "false" ? 0 : 1;
+  }
+
+  if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+  if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
+
+  // Check id is null or not
+  if (id == null) res.status(404).send("The company id is not provided");
+
+  const query = `
+  SELECT DISTINCT h1bCaseId, empName, jobTitle, fulltime, caseStatus, caseYear, Date_Format(submitDate,'%Y-%m-%d') As submitDate, Date_Format(decisionDate,'%Y-%m-%d') As decisionDate, wageFrom
+  FROM H1bCase
+  WHERE companyId = ${id}
+    AND fulltime = ${fullTime}
+    AND caseStatus = '${caseStatus}'
+    AND submitDate > '${dateFloor}'
+    AND decisionDate < '${dateCeil}'
+  `;
+
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      console.log(data);
+      res.json(data);
+    }
+  });
+};
+
+// Route 14
+// GET /interviewStats/:company_id
+const getOneCompanyInterviewStats = async function(req, res) {
+  // Retrieve companyId from the parameters
+  const id = req.params.id;
+
+  // Check id is null or not
+  if (id == null) res.status(404).send('The company id is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT DISTINCT * FROM
+  (
+      SELECT companyId, numReviews FROM Review
+      WHERE companyId = 1792
+  ) R
+  JOIN(
+      SELECT
+          companyId,
+          SUM(IF(experience = 'Favorable', 1, 0)) as numFavorable,
+          SUM(IF(experience = 'Average', 1, 0)) as numAverage,
+          SUM(IF(experience = 'Unfavorable', 1, 0)) as numUnfavorable,
+          SUM(IF(difficulty = 'Easy', 1, 0)) as numEasy,
+          SUM(IF(difficulty = 'Medium', 1, 0)) as numMedium,
+          SUM(IF(difficulty = 'Difficult', 1, 0)) as numDifficult,
+          AVG(timeline_days) avg_timeline_days,
+          COUNT(*) totalReviews
+      FROM InterviewReview
+      WHERE companyId = 1792
+  ) IR ON (R.companyId = IR.companyId)
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+
+
 module.exports = {
   getOneUser,
   createOneUser,
   getAllCompanies,
   getOneCompany,
   getOneCompanyH1bSummary,
+  getOneCompanyH1bCases,
+  getOneCompanyInterviewStats,
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,
