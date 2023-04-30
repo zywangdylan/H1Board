@@ -1,0 +1,13 @@
+#logo {
+    width : 12vw;
+    height : 8vh;
+    z-index: 4;
+}
+
+.boxNavBar {
+    top : 0;
+    position : fixed;
+    z-index: 4;
+    height: 10vh;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
