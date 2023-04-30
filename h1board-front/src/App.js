@@ -5,11 +5,10 @@ import { createTheme } from "@mui/material/styles";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import React, { useState } from 'react';
-import Navbar from './components/NavBar/NavBar';
+import NavBar from './components/NavBar';
 import HomePage from './pages/HomePage';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
-import AlbumInfoPage from './pages/AlbumInfoPage'
 import LogoutComponent from './components/Logout/Logout';
 
 // createTheme enables you to customize the look and feel of your app past the default
@@ -23,7 +22,7 @@ export const theme = createTheme({
 
 export default function App() {
   const location = useLocation();
-  const [userId, setUserId] = React.useState(localStorage.getItem('UID') || null);
+  const [userId, setUserId] = useState(localStorage.getItem('UID') || null);
 
   const userStateChanger = (title) => {
     setUserId(title);
@@ -40,9 +39,8 @@ export default function App() {
           key={location.key}
         >
           <Routes location={location}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/logout" element={<LogoutComponent />} />
-            <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/logout" element={<LogoutComponent />} />
             <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/company/:company_id" element={<CompanyPage />} />
           </Routes>

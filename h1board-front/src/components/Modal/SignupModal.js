@@ -59,7 +59,10 @@ const SignupModal = forwardRef(({ setOpen, setSignupAlert, setResult }, ref) => 
         resetForm();
         if (!result.error) {
           setOpen(false);
-          window.location.reload(true);
+          setSignupAlert(true);
+          setTimeout(() => {
+            window.location.reload(true);
+          }, 2000);
         } else {
           throw Error("Error signing up")
         }

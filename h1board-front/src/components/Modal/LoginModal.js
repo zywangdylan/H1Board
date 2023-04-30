@@ -11,10 +11,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { PropaneSharp, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import './style.css';
 import { useNavigate } from "react-router-dom";
-var W3CWebSocket = require('websocket').w3cwebsocket;
 
 const config = require('../../config.json');
 
@@ -44,7 +43,6 @@ async function loginUser(data) {
     });
 }
 const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setResult }, ref) => {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [errorHint, setErrorHint] = useState('');
   const [name, setName] = useState('');
@@ -65,8 +63,11 @@ const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setRe
         await localStorage.setItem("user_data", JSON.stringify(user));
         await localStorage.setItem("UID", user.userId);
         userStateChanger(JSON.parse(JSON.stringify(user)).userId);
+        setLoginAlert(true);
         localStorage.setItem('limit', 3);
-        window.location.reload(true);
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 2000);
       }
     } catch (err) {
       setErrorHint(`Error login : ${err.message}`);
@@ -123,7 +124,6 @@ const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setRe
       </Box>
       <Box sx={{ backgroundColor: 'primary', height: '1rem', mt: 5 }} />
     </Box>
-
   );
 });
 
