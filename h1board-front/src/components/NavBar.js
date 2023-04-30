@@ -28,12 +28,12 @@ const NavText = ({ href, text, isMain }) => {
 
 export default function NavBar() {
   return (
-    <AppBar position='static' color='primary'>
+    <AppBar position='static' color='transparent'>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
           <NavText href='/' text='H1BOARD' isMain />
-          <NavText href='/albums' text='ALBUMS' />
-          <NavText href='/songs' text='SONGS' />
+          <NavText href='/companies' text='COMPANY' />
+          {/* <NavText href='/songs' text='SONGS' /> */}
         </Toolbar>
       </Container>
     </AppBar>

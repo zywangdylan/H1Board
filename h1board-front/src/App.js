@@ -1,12 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { blue, yellow } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import NavBar from './components/NavBar';
 import HomePage from './pages/HomePage';
-import AlbumsPage from './pages/AlbumsPage';
-import SongsPage from './pages/SongsPage';
+import CompaniesPage from './pages/CompaniesPage';
+import CompanyPage from './pages/CompanyPage';
 import AlbumInfoPage from './pages/AlbumInfoPage'
 
 // createTheme enables you to customize the look and feel of your app past the default
@@ -19,18 +20,26 @@ export const theme = createTheme({
 });
 
 export default function App() {
+  const location = useLocation();
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <NavBar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/albums" element={<AlbumsPage />} />
-          <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
-          <Route path="/songs" element={<SongsPage />} />
-        </Routes>
-      </BrowserRouter>
+      <NavBar/>
+      <TransitionGroup component={null}>
+        <CSSTransition
+          timeout={300}
+          classNames='fade'
+          key={location.key}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/albums/:album_id" element={<AlbumInfoPage />} />
+            <Route path="/companies" element={<CompaniesPage />} />
+            <Route path="/company/:company_id" element={<CompanyPage />} />
+          </Routes>
+        </CSSTransition>
+      </TransitionGroup>
     </ThemeProvider>
   );
 }

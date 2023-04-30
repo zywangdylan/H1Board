@@ -9,7 +9,7 @@ const config = require('../config.json');
 export default function AlbumInfoPage() {
   const { album_id } = useParams();
 
-  const [songData, setSongData] = useState([{}]); // default should actually just be [], but empty object element added to avoid error in template code
+  const [songData, setSongData] = useState([{}]);
   const [albumData, setAlbumData] = useState([]);
 
   const [selectedSongId, setSelectedSongId] = useState(null);
@@ -21,7 +21,10 @@ export default function AlbumInfoPage() {
 
     fetch(`http://${config.server_host}:${config.server_port}/album_songs/${album_id}`)
       .then(res => res.json())
-      .then(resJson => setSongData(resJson));
+      .then(resJson => {
+        console.log(resJson)
+        setSongData(resJson)
+      });
   }, [album_id]);
 
   return (
@@ -55,10 +58,7 @@ export default function AlbumInfoPage() {
           </TableHead>
           <TableBody>
             {
-              // TODO (TASK 23): render the table content by mapping the songData array to <TableRow> elements
-              // Hint: the skeleton code for the very first row is provided for you. Fill out the missing information and then use a map function to render the rest of the rows.
-              // Hint: it may be useful to refer back to LazyTable.js
-              songData.map((song) => 
+              songData.map((song) =>
                 <TableRow key={song.song_id}>
                   <TableCell key='#'>{song.number}</TableCell>
                   <TableCell key='Title'>
