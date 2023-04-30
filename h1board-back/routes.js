@@ -129,6 +129,53 @@ const getOneCompany = async function (req, res) {
   });
 };
 
+// GET /company?name=
+const getCompanyByName = async function (req, res) {
+  // Retrieve companyName from the parameters
+  const name = req.query.name;
+
+  // Check id is null or not
+  if (name == null) res.status(404).send('The company name is not provided');
+
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT companyId
+  FROM Company
+  WHERE name = '${name}'
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Company name ", String(name), " does not exist.");
+      res.status(404).send('Company name does not exist.');
+    } else {
+      res.json(data);
+    }
+  });
+}
+
+// GET /companiesName
+const getCompaniesName = async function (req, res) {
+  // Write the query to retrieve the company's name and industry
+  const query = `
+  SELECT DISTINCT name
+  FROM Company
+  `
+  connection.query(query, (err, data) => {
+    if (err) {
+      console.log(err);
+      res.json({});
+    } else if (data.length === 0) {
+      console.log("Can't get companies name");
+      res.status(404).send("Can't get companies name.");
+    } else {
+      res.json(data);
+    }
+  });
+}
+
 // Route 3: GET /popularCompanies
 const getPopularCompanies = async function (req, res) {
   // Retrieve castStatus, wageFrom, and industry from query params
@@ -769,6 +816,8 @@ module.exports = {
   createOneUser,
   getAllCompanies,
   getOneCompany,
+  getCompanyByName,
+  getCompaniesName,
   getPopularCompanies,
   getHRC_Review,
   getHRC_empSize,
