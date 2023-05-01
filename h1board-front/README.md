@@ -5,7 +5,17 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## File Structure
 - src: This folder typically contains all the source code for the project.
     - components: This folder contains all the reusable UI components used in the project.
+        - Modal
+            - LoginModal: Standard login and Google login
+            - SingupModal: Sign up a new user
+        - Logout: Logout the current user
+        - CompanySummary: Stats and ratings summary of one company
+        - H1BCases: H1B stats of one company
+        - NavBar: Navigation bar at the top of the page that can navigate to different pages
     - pages: This folder contains all the main pages/views of the project.
+        - CompaniesPage: Display all companies' name and empSize with pagination
+        - CompanyPage: Single company page with two tabs (CompanySummary and H1BCases components)
+        - HomePage: Search page with autocomplete implemented
     - assets: This folder contains all the static assets used in the project, such as images, fonts, and stylesheets.
     - helpers: This folder contains all the utility functions and modules used throughout the project.
     - services: This folder contains all the services and API clients used to fetch data from a backend server.
@@ -16,11 +26,25 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 - package-lock.json: This file is generated automatically by npm to lock down the exact versions of dependencies installed in the project.
 
 ## React Components
-
+- useState (https://react.dev/reference/react/useState) - https://react.dev/reference/react/useState
+- useEffect (https://react.dev/reference/react/useEffect) - useEffect is a React Hook that lets you synchronize a component with an external system.
+- useRef (https://react.dev/reference/react/useRef) - useRef is a React Hook that lets you reference a value that’s not needed for rendering.
 ## External Packages
 - Material UI (https://material-ui.com/) - React components for faster and easier web development
 - Recharts (https://recharts.org/en-US/) - A composable charting library built on React components
 - react-transition-group (https://reactcommunity.org/react-transition-group/) - An easy way to perform animations when a React component enters or leaves the DOM
+- react-router-dom (https://www.npmjs.com/package/react-router-dom) - bindings for using React Router in web applications
+- dayjs (https://www.npmjs.com/package/dayjs) - Day.js is a minimalist JavaScript library that parses, validates, manipulates, and displays dates and times for modern browsers with a largely Moment.js-compatible API
+- jwt_decode (https://www.npmjs.com/package/jwt-decode) - jwt-decode is a small browser library that helps decoding JWTs token which are Base64Url encoded.
+- google-maps-react (https://www.npmjs.com/package/google-maps-react) - A declarative Google Map React component using React, lazy-loading dependencies, current-location finder and a test-driven approach by the Fullstack React team.
+
+## Installation
+
+Instructions on how to install the project, such as:
+
+1. Clone the repository.
+2. Run `npm install` to install dependencies.
+3. Run `npm start` to start the server.
 
 ## Available Scripts
 
