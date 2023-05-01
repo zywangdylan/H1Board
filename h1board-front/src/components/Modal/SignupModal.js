@@ -67,7 +67,7 @@ const SignupModal = forwardRef(({ userStateChanger, setOpen, setSignupAlert, set
           await localStorage.setItem("UID", user.userId);
           setTimeout(() => {
             window.location.reload(false);
-          }, 2000);
+          }, 500);
         } else {
           throw Error("Error signing up")
         }
