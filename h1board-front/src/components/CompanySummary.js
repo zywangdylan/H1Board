@@ -177,15 +177,15 @@ export default function H1B(props) {
             </Link>
           </div>
         ) : (
-        <div style={{ margin: "2rem 0" }}>
-          <div>
+        <div style={{ margin: "2rem" }}>
+          <div style={{ margin: "1.5rem 0"}}>
             <Typography variant="h4">Company Description</Typography>
             <Typography variant="body1">{description}</Typography>
           </div>
           {buttonClicked ? (
-            <div>
+            <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <BarChart
-                width={1200}
+                width={1000}
                 height={300}
                 data={ratingData}
                 layout="vertical"
@@ -211,7 +211,7 @@ export default function H1B(props) {
                 </Bar>
               </BarChart>
               <BarChart
-                width={1200}
+                width={1000}
                 height={300}
                 data={statsData}
                 layout="vertical"
@@ -232,9 +232,9 @@ export default function H1B(props) {
               </BarChart>
             </div>
           ) : (
-            <div>
+            <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
               <BarChart
-                width={1200}
+                width={1000}
                 height={300}
                 data={initialDataRatings}
                 layout="vertical"
@@ -260,7 +260,7 @@ export default function H1B(props) {
                 </Bar>
               </BarChart>
               <BarChart
-                width={1200}
+                width={1000}
                 height={300}
                 data={initialDataStats}
                 layout="vertical"
@@ -281,13 +281,17 @@ export default function H1B(props) {
               </BarChart>
             </div>
           )}
-          <div>
+          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <TextField
-            label='Company Name' value={companySearch} onChange={(e) => setCompanySearch(e.target.value)} style={{ width: "100%", margin: "1rem 0" }}/>
+              label='Company Name'
+              value={companySearch}
+              onChange={(e) => setCompanySearch(e.target.value)}
+              style={{ width: "40%", margin: "1rem 1rem" }}
+            />
+            <Button variant="contained" color="primary" onClick={handleButtonClick} style={{height: '3.5rem'}}>
+              Compare
+            </Button>
           </div>
-          <Button variant="contained" color="primary" onClick={handleButtonClick}>
-            Compare with Another Company
-          </Button>
         </div>
         )
       }

@@ -110,6 +110,7 @@ const LoginModal = forwardRef(({ userStateChanger, setOpen, setLoginAlert, setRe
           name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onClick={handleClickShowPassword}
           type={showPassword ? 'text' : 'password'}
           endAdornment={(
             <InputAdornment position="end">
