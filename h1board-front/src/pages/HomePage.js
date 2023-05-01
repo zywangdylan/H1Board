@@ -5,7 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 const config = require('../config.json');
 
-export default function HomePage() {
+export default function HomePage(props) {
+  const {
+    setSearchAlert
+  } = props;
   const [searchTerm, setSearchTerm] = useState('');
   const [companiesName, setCompaniesName] = useState([]);
   const navigate = useNavigate();
@@ -40,7 +43,10 @@ export default function HomePage() {
   async function getCompanyId(term) {
     return fetch(`http://${config.server_host}:${config.server_port}/company?name=${term}`)
       .then((data) => {
-        return data.json()
+        if (data.status === 404)
+          return -1;
+        else
+          return data.json();
       })
       .catch((error) => error);
   }
@@ -49,7 +55,14 @@ export default function HomePage() {
     // You can perform your search logic here
     async function navigateToTargetCompany() {
       let data = await getCompanyId(searchTerm);
-      navigate(`/company/${data[0].companyId}`);
+      if (data === -1) {
+        setSearchAlert(true);
+        setTimeout(() => {
+          setSearchAlert(false);
+        }, 2000);
+      }
+      else
+        navigate(`/company/${data[0].companyId}`);
     }
     navigateToTargetCompany();
   };
