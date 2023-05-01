@@ -25,6 +25,7 @@ export default function App() {
   const location = useLocation();
   const [userId, setUserId] = useState(localStorage.getItem('UID') || null);
   const [loginAlert, setLoginAlert] = useState(false);
+  const [searchAlert, setSearchAlert] = useState(false);
 
   const userStateChanger = (title) => {
     setUserId(title);
@@ -62,6 +63,11 @@ export default function App() {
           <Alert severity="success">Login Successfully! 🥳</Alert>
         ) : null
       }
+      {
+        searchAlert ? (
+          <Alert severity="error">Search Failed! No such company!</Alert>
+        ) : null
+      }
       <TransitionGroup component={null}>
         <CSSTransition
           timeout={300}
@@ -69,7 +75,7 @@ export default function App() {
           key={location.key}
         >
           <Routes location={location}>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<HomePage setSearchAlert={setSearchAlert}/>} />
             <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/company/:company_id" element={<CompanyPage />} />
             <Route path="/locations" element={<LocationPage />} />
