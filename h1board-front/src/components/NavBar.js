@@ -32,24 +32,6 @@ const NavText = ({ href, text, isMain }) => {
   )
 }
 
-async function logoutUser() {
-  /* return fetch(`${logout()}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include'
-  })
-    .then(async (data) => {
-      if (data.status >= 400)
-        throw Error(await data.json())
-      return data.json()
-    })
-    .catch((error) => {
-      throw error;
-    }); */
-}
-
 export default function NavBar(props) {
   const navigate = useNavigate();
   const [openLogin, setOpenLogin] = useState(false);
@@ -68,7 +50,6 @@ export default function NavBar(props) {
 
   const onClickLogout = async () => {
     try {
-      await logoutUser();
       localStorage.removeItem('user_data');
       localStorage.removeItem('UID');
       setUser(null);
