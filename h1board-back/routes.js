@@ -643,7 +643,7 @@ const getOneCompanyH1bSummary = async function (req, res) {
     : "2017-09-30";
 
     
-    if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+    if (dateFloor == "NaN-aN-aN") dateFloor = "2009-04-15";
     if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
 
   // Check id is null or not
@@ -719,7 +719,7 @@ const getOneCompanyH1bCases = async function (req, res) {
     fullTime = fullTime.trim() == "false" ? 0 : 1;
   }
 
-  if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+  if (dateFloor == "NaN-aN-aN") dateFloor = "2009-04-15";
   if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
 
   // Check id is null or not
