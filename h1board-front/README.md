@@ -43,7 +43,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 Instructions on how to install the project, such as:
 
 1. Clone the repository.
-2. Run `npm install` to install dependencies.
+2. Run `npm install` to install dependencies. (`npm install --force google-maps-react` for `google-maps-react` dependency)
 3. Run `npm start` to start the server.
 
 ## Available Scripts
