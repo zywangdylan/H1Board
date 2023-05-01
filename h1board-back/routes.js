@@ -634,20 +634,61 @@ const welcome = async function (req, res) {
 const getOneCompanyH1bSummary = async function (req, res) {
   // Retrieve companyId from the parameters
   const id = req.params.id;
-  const wageFrom = req.query.wageFrom ? req.query.wageFrom : 0;
+
+  var dateFloor = req.query.submitDate
+    ? convert(req.query.submitDate)
+    : "2009-04-15";
+  var dateCeil = req.query.decisionDate
+    ? convert(req.query.decisionDate)
+    : "2017-09-30";
+
+    
+    if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+    if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
+    console.log("dateFloor, ", dateFloor, " ", dateCeil);
 
   // Check id is null or not
-  if (id == null) res.status(404).send("The company id is not provided");
+  if (id == null) res.status(404).send('The company id is not provided');
 
   // Write the query to retrieve the company's name and industry
   const query = `
-  SELECT
-    companyId,
-    SUM(IF(caseStatus = 'C', 1, 0)) as numApproved,
-    SUM(IF(wageFrom > ${wageFrom}, 1, 0)) as numWagesAbove,
-    COUNT(*) as totalCases
-  FROM H1bCase
-  WHERE companyId = ${id}
+    SELECT * FROM
+    (
+      SELECT
+        companyId as currentCompany,
+        SUM(IF(caseStatus = 'C', 1, 0)) as numApproved,
+        COUNT(*) as totalCases,
+        SUM(fulltime) as numFullTimes,
+        AVG(DATEDIFF(decisionDate, submitDate)) as avgProcessTimeInDate,
+        CONCAT((SUM(IF(caseStatus = 'C', 1, 0)) * 100 DIV COUNT(*)), '%') as approvalRate
+      FROM H1bCase
+      WHERE companyId = ${id} AND submitDate > '${dateFloor}' AND decisionDate < '${dateCeil}'
+    ) CC
+    JOIN
+    (
+    SELECT
+        ${id} as currentCompany,
+        SUM(IF(caseStatus = 'C', 1, 0)) as numApprovedInOthers,
+        COUNT(*) as totalCasesInOthers,
+        SUM(fulltime) as numFullTimesInOthers,
+        AVG(DATEDIFF(decisionDate, submitDate)) as avgProcessTimeInDateInOthers,
+        CONCAT((SUM(IF(caseStatus = 'C', 1, 0)) * 100 DIV COUNT(*)), '%') as approvalRateInOthers
+    FROM H1bCase
+    WHERE submitDate > '${dateFloor}'
+    AND decisionDate < '${dateCeil}' AND companyId IN
+        (
+            SELECT
+                C.otherCompanyId
+            FROM
+            (SELECT
+                industryId,
+                companyId as otherCompanyId
+            FROM Company WHERE companyId != ${id}) C
+            JOIN
+            (SELECT industryId FROM Company WHERE companyId = ${id}) I
+            USING (industryId)
+        )
+    ) OCC USING (currentCompany)
   `;
   connection.query(query, (err, data) => {
     if (err) {
@@ -657,6 +698,7 @@ const getOneCompanyH1bSummary = async function (req, res) {
       console.log("Company id ", String(id), " does not exist.");
       res.status(404).send("Company id does not exist.");
     } else {
+      console.log(data);
       res.json(data);
     }
   });

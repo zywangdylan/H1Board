@@ -83,12 +83,14 @@ export default function H1B(props) {
           const h1bCasesWithId = dataCases.map((cases) => ({ id : cases.h1bCaseId, ...cases}));
           setCompanyCases(h1bCasesWithId);
 
-          if (dataSummary.length > 0 && dataSummary[0].companyId) {
-            const h1bSummaryWithId = dataSummary.map((summary) => ({ id : summary.companyId, ...summary}));
+          if (dataSummary.length > 0 && dataSummary[0].currentCompany) {
+            const h1bSummaryWithId = dataSummary.map((summary) => ({ id : summary.currentCompany, ...summary}));
             setCompanySummary(h1bSummaryWithId);
           } else {
             setCompanySummary([]);
           }
+
+          console.log("frontend data, ", dataSummary);
           setOpenLoading(false);
         })
         .catch((err) => {
@@ -116,6 +118,14 @@ export default function H1B(props) {
       { field: 'approvalRate', width: 225, headerName: 'Approval Rate'},
       { field: 'numFullTimes', width: 225, headerName: 'Fulltime Cases'},
       { field: 'avgProcessTimeInDate', width: 245, headerName: 'Average Processing Time (Days)'}
+    ]
+
+    const summaryOthersColumns = [
+      { field: 'numApprovedInOthers', width: 225, headerName: 'Cases Approved'},
+      { field: 'totalCasesInOthers',  width: 225, headerName: 'Total Cases' },
+      { field: 'approvalRateInOthers', width: 225, headerName: 'Approval Rate'},
+      { field: 'numFullTimesInOthers', width: 225, headerName: 'Fulltime Cases'},
+      { field: 'avgProcessTimeInDateInOthers', width: 245, headerName: 'Average Processing Time (Days)'}
     ]
 
     return (
@@ -194,10 +204,20 @@ export default function H1B(props) {
                 </Button>
               </div>
 
-              <h3>H1B Stats Summary table</h3>
+              <h3>Company H1B Stats Summary </h3>
               <DataGrid
                 rows={companySummary}
                 columns={summaryColumns}
+                pageSize={pageSize}
+                rowsPerPageOptions={[5, 10, 25]}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                autoHeight
+              />
+
+              <h3>Industry H1B Stats Summary</h3>
+              <DataGrid
+                rows={companySummary}
+                columns={summaryOthersColumns}
                 pageSize={pageSize}
                 rowsPerPageOptions={[5, 10, 25]}
                 onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
