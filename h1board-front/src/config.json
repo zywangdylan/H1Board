@@ -1,4 +1,5 @@
 {
   "server_host": "localhost",
-  "server_port": "8080"
+  "server_port": "8080",
+  "API_KEY": "AIzaSyCG14yNn2d4Lwot__YjEpNdB5N_bxnjLDA"
 }

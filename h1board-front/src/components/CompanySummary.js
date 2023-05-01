@@ -121,7 +121,9 @@ export default function H1B(props) {
   const handleButtonClick = () => {
     setOpenLoading(true);
     fetch(
-      `http://${config.server_host}:${config.server_port}/companySummary/${0}?companyName=${companySearch.toLowerCase()}`
+      `http://${config.server_host}:${
+        config.server_port
+      }/companySummary/${0}?companyName=${companySearch.toLowerCase()}`
     )
       .then((res) => res.json())
       .then((resJson) => {
@@ -135,7 +137,8 @@ export default function H1B(props) {
               name: companySummaryWithId[0].company_name + " ratings",
               average_rating: companySummaryWithId[0].avg_rating,
               work_life_balance: companySummaryWithId[0].workLifeBalance,
-              job_security_and_advancement: companySummaryWithId[0].jobSecurityOrAdvance,
+              job_security_and_advancement:
+                companySummaryWithId[0].jobSecurityOrAdvance,
               management_score: companySummaryWithId[0].management,
               culture_score: companySummaryWithId[0].culture,
             },
@@ -177,122 +180,122 @@ export default function H1B(props) {
             </Link>
           </div>
         ) : (
-        <div style={{ margin: "2rem" }}>
-          <div style={{ margin: "1.5rem 0"}}>
-            <Typography variant="h4">Company Description</Typography>
-            <Typography variant="body1">{description}</Typography>
-          </div>
-          {buttonClicked ? (
-            <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-              <BarChart
-                width={1000}
-                height={300}
-                data={ratingData}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" />
-                <Tooltip />
-                <Bar dataKey="average_rating" fill="#82ca9d">
-                  <LabelList dataKey="average_rating" position="right" />
-                </Bar>
-                <Bar dataKey="work_life_balance" fill="#DFFF00">
-                  <LabelList dataKey="work_life_balance" position="right" />
-                </Bar>
-                <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
-                  <LabelList dataKey="job_security_and_advancement" position="right" />
-                </Bar>
-                <Bar dataKey="management_score" fill="#FF7F50">
-                  <LabelList dataKey="management_score" position="right" />
-                </Bar>
-                <Bar dataKey="culture_score" fill="#DE3163">
-                  <LabelList dataKey="culture_score" position="right" />
-                </Bar>
-              </BarChart>
-              <BarChart
-                width={1000}
-                height={300}
-                data={statsData}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" />
-                <Tooltip />
-                <Bar dataKey="num_reviews" fill="#8884d8">
-                  <LabelList dataKey="num_reviews" position="right" />
-                </Bar>
-                <Bar dataKey="num_locations" fill="#3f51b5">
-                <LabelList dataKey="num_locations" position="right" />
-                </Bar>
-                <Bar dataKey="num_jobs" fill="#283593">
-                  <LabelList dataKey="num_jobs" position="right" />
-                </Bar>
-              </BarChart>
+          <div style={{ margin: "2rem" }}>
+            <div style={{ margin: "1.5rem 0"}}>
+              <Typography variant="h4">Company Description</Typography>
+              <Typography variant="body1">{description}</Typography>
             </div>
-          ) : (
-            <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-              <BarChart
-                width={1000}
-                height={300}
-                data={initialDataRatings}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" />
-                <Tooltip />
-                <Bar dataKey="average_rating" fill="#82ca9d">
-                  <LabelList dataKey="average_rating" position="right" />
-                </Bar>
-                <Bar dataKey="work_life_balance" fill="#98D8AA">
-                  <LabelList dataKey="work_life_balance" position="right" />
-                </Bar>
-                <Bar dataKey="job_security_and_advancement" fill="#F3E99F">
-                  <LabelList dataKey="job_security_and_advancement" position="right" />
-                </Bar>
-                <Bar dataKey="management_score" fill="#F7D060">
-                  <LabelList dataKey="management_score" position="right" />
-                </Bar>
-                <Bar dataKey="culture_score" fill="#FF6D60">
-                  <LabelList dataKey="culture_score" position="right" />
-                </Bar>
-              </BarChart>
-              <BarChart
-                width={1000}
-                height={300}
-                data={initialDataStats}
-                layout="vertical"
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis type="category" dataKey="name" />
-                <Tooltip />
-                <Bar dataKey="num_reviews" fill="#8884d8">
-                  <LabelList dataKey="num_reviews" position="right" />
-                </Bar>
-                <Bar dataKey="num_locations" fill="#3f51b5">
+            {buttonClicked ? (
+              <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                <BarChart
+                  width={1000}
+                  height={300}
+                  data={ratingData}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="name" />
+                  <Tooltip />
+                  <Bar dataKey="average_rating" fill="#82ca9d">
+                    <LabelList dataKey="average_rating" position="right" />
+                  </Bar>
+                  <Bar dataKey="work_life_balance" fill="#DFFF00">
+                    <LabelList dataKey="work_life_balance" position="right" />
+                  </Bar>
+                  <Bar dataKey="job_security_and_advancement" fill="#FFBF00">
+                    <LabelList dataKey="job_security_and_advancement" position="right" />
+                  </Bar>
+                  <Bar dataKey="management_score" fill="#FF7F50">
+                    <LabelList dataKey="management_score" position="right" />
+                  </Bar>
+                  <Bar dataKey="culture_score" fill="#DE3163">
+                    <LabelList dataKey="culture_score" position="right" />
+                  </Bar>
+                </BarChart>
+                <BarChart
+                  width={1000}
+                  height={300}
+                  data={statsData}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="name" />
+                  <Tooltip />
+                  <Bar dataKey="num_reviews" fill="#8884d8">
+                    <LabelList dataKey="num_reviews" position="right" />
+                  </Bar>
+                  <Bar dataKey="num_locations" fill="#3f51b5">
                   <LabelList dataKey="num_locations" position="right" />
-                </Bar>
-                <Bar dataKey="num_jobs" fill="#283593">
-                  <LabelList dataKey="num_jobs" position="right" />
-                </Bar>
-              </BarChart>
+                  </Bar>
+                  <Bar dataKey="num_jobs" fill="#283593">
+                    <LabelList dataKey="num_jobs" position="right" />
+                  </Bar>
+                </BarChart>
+              </div>
+            ) : (
+              <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                <BarChart
+                  width={1000}
+                  height={300}
+                  data={initialDataRatings}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="name" />
+                  <Tooltip />
+                  <Bar dataKey="average_rating" fill="#82ca9d">
+                    <LabelList dataKey="average_rating" position="right" />
+                  </Bar>
+                  <Bar dataKey="work_life_balance" fill="#98D8AA">
+                    <LabelList dataKey="work_life_balance" position="right" />
+                  </Bar>
+                  <Bar dataKey="job_security_and_advancement" fill="#F3E99F">
+                    <LabelList dataKey="job_security_and_advancement" position="right" />
+                  </Bar>
+                  <Bar dataKey="management_score" fill="#F7D060">
+                    <LabelList dataKey="management_score" position="right" />
+                  </Bar>
+                  <Bar dataKey="culture_score" fill="#FF6D60">
+                    <LabelList dataKey="culture_score" position="right" />
+                  </Bar>
+                </BarChart>
+                <BarChart
+                  width={1000}
+                  height={300}
+                  data={initialDataStats}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="name" />
+                  <Tooltip />
+                  <Bar dataKey="num_reviews" fill="#8884d8">
+                    <LabelList dataKey="num_reviews" position="right" />
+                  </Bar>
+                  <Bar dataKey="num_locations" fill="#3f51b5">
+                    <LabelList dataKey="num_locations" position="right" />
+                  </Bar>
+                  <Bar dataKey="num_jobs" fill="#283593">
+                    <LabelList dataKey="num_jobs" position="right" />
+                  </Bar>
+                </BarChart>
+              </div>
+            )}
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <TextField
+                label='Company Name'
+                value={companySearch}
+                onChange={(e) => setCompanySearch(e.target.value)}
+                style={{ width: "40%", margin: "1rem 1rem" }}
+              />
+              <Button variant="contained" color="primary" onClick={handleButtonClick} style={{height: '3.5rem'}}>
+                Compare
+              </Button>
             </div>
-          )}
-          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-            <TextField
-              label='Company Name'
-              value={companySearch}
-              onChange={(e) => setCompanySearch(e.target.value)}
-              style={{ width: "40%", margin: "1rem 1rem" }}
-            />
-            <Button variant="contained" color="primary" onClick={handleButtonClick} style={{height: '3.5rem'}}>
-              Compare
-            </Button>
           </div>
-        </div>
         )
       }
       <Backdrop

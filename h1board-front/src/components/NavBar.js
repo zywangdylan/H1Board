@@ -85,6 +85,7 @@ export default function NavBar(props) {
           <NavText href='/' text='H1BOARD' isMain />
           <div style={{ flexGrow: 1 }}>
             <NavText href='/companies' text='COMPANY' />
+            <NavText href='/locations' text='LOCATION' />
           </div>
           {
             user === 'null' || user === null
