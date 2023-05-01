@@ -25,8 +25,8 @@ export default function H1B(props) {
 
     const [fullTime, setFullTime] = useState(true);
     const [caseStatus, setCaseStatus] = useState(true);
-    const [submitDate, setSubmitDate] = useState(dayjs(null));
-    const [decisionDate, setDecisionDate] =useState(dayjs(null));
+    const [submitDate, setSubmitDate] = useState(dayjs('2009-04-01'));
+    const [decisionDate, setDecisionDate] =useState(dayjs('2017-09-30'));
     const [noResult, setNoResult] = useState(false);
 
     useEffect(() => {
@@ -90,7 +90,6 @@ export default function H1B(props) {
             setCompanySummary([]);
           }
 
-          console.log("frontend data, ", dataSummary);
           setOpenLoading(false);
         })
         .catch((err) => {
@@ -177,6 +176,9 @@ export default function H1B(props) {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                        <StaticDatePicker
                           orientation="landscape"
+                          defaultValue={dayjs('2009-04-01')}
+                          minDate={dayjs('2009-04-01', 'YYYY-MM-DD')}
+                          maxDate={dayjs('2017-09-30', 'YYYY-MM-DD')}
                           label="Submit Date picker"
                           value={submitDate}
                           onChange={(newValue) => setSubmitDate(newValue)}
@@ -188,6 +190,9 @@ export default function H1B(props) {
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                        <StaticDatePicker
                           orientation="landscape"
+                          defaultValue={dayjs('2017-09-30')}
+                          minDate={dayjs('2009-04-01', 'YYYY-MM-DD')}
+                          maxDate={dayjs('2017-09-30', 'YYYY-MM-DD')}
                           label="Decision Date picker"
                           value={decisionDate}
                           onChange={(newValue) => setDecisionDate(newValue)}
