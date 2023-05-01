@@ -1,18 +1,53 @@
 import * as React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, FormControlLabel, Grid, Link, Typography, Backdrop } from '@mui/material';
+import { Button, Checkbox, FormControlLabel, Grid, Link, Typography, Backdrop, Fab, Box, Fade, useScrollTrigger } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { useParams, useNavigate } from 'react-router-dom';
 import ErrorIcon from '@mui/icons-material/Error';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import CircularProgress from '@mui/material/CircularProgress';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 const config = require('../config.json');
+
+function ScrollTop(props) {
+  const { children, window } = props;
+
+  const trigger = useScrollTrigger({
+    target: window ? window() : undefined,
+    disableHysteresis: true,
+    threshold: 200,
+  });
+
+  const handleClick = (event) => {
+    const anchor = (event.target.ownerDocument || document).querySelector(
+      '#back-to-top-anchor',
+    );
+
+    if (anchor) {
+      anchor.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <Fade in={trigger}>
+      <Box
+        onClick={handleClick}
+        role="presentation"
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+      >
+        {children}
+      </Box>
+    </Fade>
+  );
+}
 
 export default function H1B(props) {
     const navigate = useNavigate();
@@ -82,7 +117,6 @@ export default function H1B(props) {
         .then(([dataCases, dataSummary]) => {
           const h1bCasesWithId = dataCases.map((cases) => ({ id : cases.h1bCaseId, ...cases}));
           setCompanyCases(h1bCasesWithId);
-
           if (dataSummary.length > 0 && dataSummary[0].currentCompany) {
             const h1bSummaryWithId = dataSummary.map((summary) => ({ id : summary.currentCompany, ...summary}));
             setCompanySummary(h1bSummaryWithId);
@@ -128,7 +162,7 @@ export default function H1B(props) {
     ]
 
     return (
-      <div>
+      <div style={{ width: "100%", marginBottom: "4rem" }}>
         {
           noResult ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'center'}}>
@@ -146,10 +180,10 @@ export default function H1B(props) {
               </Link>
             </div>
           ) : (
-            <div>
+            <div style={{ margin: "0 4rem" }}>
               <div style={{ margin: "2rem 0" }}>
-                <Grid container spacing={3} style={{ margin: "2rem 0" }}>
-                  <Grid item xs={6}>
+                <Grid container spacing={3} style={{ margin: "2rem 0", width: "100%" }}>
+                  <Grid item xs={5} style={{ display: "flex", flexDirection: "column" }}>
                     <FormControlLabel
                       label="Full Time"
                       control={
@@ -159,8 +193,18 @@ export default function H1B(props) {
                         />
                       }
                     />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        label="Submit Date"
+                        value={submitDate}
+                        defaultValue={dayjs('2009-04-01')}
+                        minDate={dayjs('2009-04-01', 'YYYY-MM-DD')}
+                        maxDate={dayjs('2017-09-30', 'YYYY-MM-DD')}
+                        onChange={(newValue) => setSubmitDate(newValue)}
+                      />
+                    </LocalizationProvider>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={5} style={{ display: "flex", flexDirection: "column" }}>
                     <FormControlLabel
                       label="Case Approved"
                       control={
@@ -170,43 +214,27 @@ export default function H1B(props) {
                         />
                       }
                     />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <p>Submit Date</p>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                       <StaticDatePicker
-                          orientation="landscape"
-                          defaultValue={dayjs('2009-04-01')}
-                          minDate={dayjs('2009-04-01', 'YYYY-MM-DD')}
-                          maxDate={dayjs('2017-09-30', 'YYYY-MM-DD')}
-                          label="Submit Date picker"
-                          value={submitDate}
-                          onChange={(newValue) => setSubmitDate(newValue)}
-                       />
-                    </LocalizationProvider>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <p>Decision Date</p>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                       <StaticDatePicker
-                          orientation="landscape"
+                      <DatePicker
                           defaultValue={dayjs('2017-09-30')}
                           minDate={dayjs('2009-04-01', 'YYYY-MM-DD')}
                           maxDate={dayjs('2017-09-30', 'YYYY-MM-DD')}
-                          label="Decision Date picker"
+                          label="Decision Date"
                           value={decisionDate}
                           onChange={(newValue) => setDecisionDate(newValue)}
-                       />
+                      />
                     </LocalizationProvider>
                   </Grid>
+                  <Grid item xs={2} style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <Button
+                      variant="contained"
+                      onClick={() => search()}
+                      style={{ left: "50%", transform: "translateX(-50%)" }}
+                    >
+                      Search
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Button
-                  variant="contained"
-                  onClick={() => search()}
-                  style={{ left: "50%", transform: "translateX(-50%)" }}
-                >
-                  Search
-                </Button>
               </div>
 
               <h3>Company H1B Stats Summary </h3>
@@ -241,6 +269,11 @@ export default function H1B(props) {
             </div>
           )
         }
+      <ScrollTop {...props}>
+        <Fab size="small" aria-label="scroll back to top">
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </ScrollTop>
         <Backdrop
           sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={openLoading}

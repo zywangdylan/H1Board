@@ -28,7 +28,7 @@ export default function CompanyPage() {
 
   return (
     <Container style={{display: 'flex', flexDirection:'column', minHeight: '70vh'}}>
-      <div style={{display: 'flex', flexDirection:'column'}}>
+      <div style={{display: 'flex', flexDirection:'column'}} id="back-to-top-anchor">
         <Typography variant="h3" style={{marginTop: '2rem'}}>{ companyInfo.name }</Typography>
         {
           companyInfo.industry == null ? <></> : (
