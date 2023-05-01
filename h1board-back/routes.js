@@ -643,9 +643,8 @@ const getOneCompanyH1bSummary = async function (req, res) {
     : "2017-09-30";
 
     
-    if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+    if (dateFloor == "NaN-aN-aN") dateFloor = "2009-04-15";
     if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
-    console.log("dateFloor, ", dateFloor, " ", dateCeil);
 
   // Check id is null or not
   if (id == null) res.status(404).send('The company id is not provided');
@@ -698,7 +697,6 @@ const getOneCompanyH1bSummary = async function (req, res) {
       console.log("Company id ", String(id), " does not exist.");
       res.status(404).send("Company id does not exist.");
     } else {
-      console.log(data);
       res.json(data);
     }
   });
@@ -721,7 +719,7 @@ const getOneCompanyH1bCases = async function (req, res) {
     fullTime = fullTime.trim() == "false" ? 0 : 1;
   }
 
-  if (dateFloor == "NaN-aN-aN") dateFloor = "2011-04-15";
+  if (dateFloor == "NaN-aN-aN") dateFloor = "2009-04-15";
   if (dateCeil == "NaN-aN-aN") dateCeil = "2017-09-30";
 
   // Check id is null or not
