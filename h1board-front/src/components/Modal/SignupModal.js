@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import './style.css';
 
 const config = require('../../config.json');
@@ -35,12 +36,15 @@ export async function registerUser(data) {
     });
 }
 
-const SignupModal = forwardRef(({ setOpen, setSignupAlert, setResult }, ref) => {
+const SignupModal = forwardRef(({ userStateChanger, setOpen, setSignupAlert, setResult }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorHint, setErrorHint] = useState('');
+  const navigate = useNavigate();
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
   const {
     handleChange, handleBlur, errors, touched, isValid, values, handleSubmit, resetForm,
   } = useFormik({
@@ -55,18 +59,20 @@ const SignupModal = forwardRef(({ setOpen, setSignupAlert, setResult }, ref) => 
           name,
           password,
         };
-        const result = await registerUser(data);
+        const user = await registerUser(data);
         resetForm();
-        if (!result.error) {
-          setOpen(false);
+        if (!user.error) {
           setSignupAlert(true);
+          await localStorage.setItem("user_data", JSON.stringify(user));
+          await localStorage.setItem("UID", user.userId);
           setTimeout(() => {
-            window.location.reload(true);
-          }, 2000);
+            window.location.reload(false);
+          }, 500);
         } else {
           throw Error("Error signing up")
         }
       } catch (err) {
+        console.log(err);
         setErrorHint('Error signing up, please try again');
       }
     },
@@ -128,7 +134,7 @@ const SignupModal = forwardRef(({ setOpen, setSignupAlert, setResult }, ref) => 
         <FormHelperText id="login-error-text">{errorHint}</FormHelperText>
       </FormControl>
       <Box sx={{
-        display: 'flex', flexDirection: 'column',justifyContent: 'center', alignItems: 'center', mx: { xs: 1, md: 5 }, my: 2,
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', mx: { xs: 1, md: 5 }, my: 2,
       }}
       >
         <div id="g_id_signup" style={{ marginTop: '1rem' }}></div>
