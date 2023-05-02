@@ -15,3 +15,22 @@ The frontend codes of the project using React
 
 **h1board-end**
 The backend codes of the project using NodeJS & ExpressJS
+
+## Deployment on AWS EC2 and DNS setup
+We have deployed our web application on an EC2 instance on AWS and have also set up a domain name for it. The domain name is h1board.live.
+
+### EC2 Deployment
+We chose to use EC2 as it provides scalable compute capacity in the cloud and allows us to easily deploy and manage our web application. To deploy our application on EC2, we followed the following steps:
+
+1. Launched an EC2 instance on AWS and configured it to use the desired operating system and hardware resources.
+2. Installed all the necessary dependencies and libraries required for running the application.
+3. Uploaded the application code to the instance using SCP or any other file transfer mechanism.
+4. Started the application server and ensured that it is listening to the correct port.
+
+### Domain Name Setup
+To set up a domain name for our web application, we followed these steps:
+
+1. Purchased a domain name from a domain registrar such as Name.com.
+2. Configured the DNS records of the domain name to point to the public IP address of the EC2 instance where our web application is deployed.
+3. Configured the domain name to use the name servers provided by the domain registrar.
+4. Once the DNS records were propagated, we were able to access our web application using the domain name h1board.live.
