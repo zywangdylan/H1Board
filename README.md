@@ -4,7 +4,7 @@ With more and more people coming from foreign countries to the U.S for higher ed
 
 ## Datasets
 ### [H1B Visa Data](https://www.kaggle.com/datasets/thedevastator/h-1b-non-immigrant-labour-visa)
-This dataset contains information about the H-1B visas obtained by US employers to employ foreign workers in specialized roles, such as engineers, scientists and software developers. This data covers multiple aspects of the visa petition process, such as detailed information regarding the petitioners, their job titles and salaries and whether their applications were successful or not. 
+This dataset contains information about the H-1B visas obtained by US employers to employ foreign workers in specialized roles, such as engineers, scientists and software developers. This data covers multiple aspects of the visa petition process, such as detailed information regarding the petitioners, their job titles and salaries and whether their applications were successful or not.
 
 ### [Company Job Reviews](https://www.kaggle.com/datasets/vaghefi/company-reviews)
 The information in this dataset is scraped from Indeed.com website containing information about companies and their employees' ratings and happiness, location, salaries and a lot of other useful information.
@@ -18,6 +18,7 @@ The backend codes of the project using NodeJS & ExpressJS
 
 ## Deployment on AWS EC2 and DNS setup
 We have deployed our web application on an EC2 instance on AWS and have also set up a domain name for it. The domain name is h1board.live.
+The website is available on http://52.22.152.70:3000/ and http://h1board.live:3000
 
 ### EC2 Deployment
 We chose to use EC2 as it provides scalable compute capacity in the cloud and allows us to easily deploy and manage our web application. To deploy our application on EC2, we followed the following steps:
