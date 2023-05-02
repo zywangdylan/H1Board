@@ -1,5 +1,4 @@
 // backend server
-
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
@@ -7,9 +6,15 @@ const routes = require('./routes');
 
 const webapp = express();
 webapp.use(cors({
-  origin: ['http://localhost:3000','http://localhost:8080'],
+  origin: ['http://localhost:3000','http://localhost:8080', 'http://h1board.live:3000', 'http://h1board.live'],
   credentials : true
 }));
+
+webapp.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 // accept command line and json inputs
 webapp.use(express.urlencoded({ extended: true }));
 webapp.use(express.json());
