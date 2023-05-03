@@ -18,7 +18,7 @@ The backend codes of the project using NodeJS & ExpressJS
 
 ## Deployment on AWS EC2 and DNS setup
 We have deployed our web application on an EC2 instance on AWS and have also set up a domain name for it. The domain name is h1board.live.
-The website is available on http://52.22.152.70:3000/ and http://h1board.live:3000
+The website is available on http://52.22.152.70/ and http://h1board.live
 
 ### EC2 Deployment
 We chose to use EC2 as it provides scalable compute capacity in the cloud and allows us to easily deploy and manage our web application. To deploy our application on EC2, we followed the following steps:
