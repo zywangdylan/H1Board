@@ -63,7 +63,7 @@ const createOneUser = async function (req, res) {
   const token = bcrypt.hashSync(req.body.password, salt);
 
   // Insert one app user into the database
-  const query = `INSERT INTO AppUser VALUES(${userId}, '${username}', '${token}')`;
+  const query = `INSERT INTO APP_User VALUES(${userId}, '${username}', '${token}')`;
 
   connection.query(query, (err, data) => {
     if (err) {

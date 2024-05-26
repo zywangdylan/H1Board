@@ -1,9 +1,9 @@
 {
-  "rds_host": "cis5500-final-project.c2cuzdcfe9qr.us-east-1.rds.amazonaws.com",
+  "rds_host": "h1board.cv6quo0qiqnu.us-east-1.rds.amazonaws.com",
   "rds_port": "3306",
   "rds_user": "Group99",
   "rds_password" : "Cis5500Group99",
-  "rds_db": "H1Board_DB",
+  "rds_db": "H1Board_New",
   "server_host": "localhost",
   "server_port":"8080",
   "JWT_SECRET": "This is our jwt secret"
