@@ -735,8 +735,6 @@ const getOneCompanyH1bCases = async function (req, res) {
       AND decisionDate < '${dateCeil}'
   `;
 
-  console.log(query);
-
   connection.query(query, (err, data) => {
     if (err) {
       console.log(err);
