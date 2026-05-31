@@ -8,7 +8,7 @@ import { SwitchTransition, CSSTransition } from "react-transition-group";
 import H1BCases from '../components/H1BCases';
 import CompanySummary from '../components/CompanySummary';
 
-const config = require('../config.json');
+const config = require('../config.js');
 
 export default function CompanyPage() {
   const { company_id } = useParams();

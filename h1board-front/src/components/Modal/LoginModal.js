@@ -14,7 +14,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import './style.css';
 
-const config = require('../../config.json');
+const config = require('../../config.js');
 
 async function loginUser(data) {
   return fetch(`http://${config.server_host}:${config.server_port}/user/signin` , {

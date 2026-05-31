@@ -16,7 +16,7 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import './style.css';
 
-const config = require('../../config.json');
+const config = require('../../config.js');
 
 export async function registerUser(data) {
   return fetch(`http://${config.server_host}:${config.server_port}/user/signup`, {

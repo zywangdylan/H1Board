@@ -12,7 +12,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import CircularProgress from '@mui/material/CircularProgress';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-const config = require('../config.json');
+const config = require('../config.js');
 
 function ScrollTop(props) {
   const { children, window } = props;

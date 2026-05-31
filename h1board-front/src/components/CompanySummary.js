@@ -23,7 +23,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from "react-router-dom";
 
-const config = require("../config.json");
+const config = require("../config.js");
 
 export default function H1B(props) {
   const { company_id } = useParams();

@@ -4,7 +4,7 @@ import InboxIcon from '@mui/icons-material/Inbox';
 import { useNavigate } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const config = require('../config.json');
+const config = require('../config.js');
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState([]);

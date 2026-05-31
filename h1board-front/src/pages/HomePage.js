@@ -3,7 +3,7 @@ import { Container, TextField, Grid, InputAdornment, IconButton, Typography, Aut
 import { Search } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-const config = require('../config.json');
+const config = require('../config.js');
 
 export default function HomePage(props) {
   const {

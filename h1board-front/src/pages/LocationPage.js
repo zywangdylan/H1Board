@@ -14,7 +14,7 @@ import Select from "@mui/material/Select";
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 
 import "./Location.css"
-const config = require("../config.json");
+const config = require("../config.js");
 const locationsFile = require("../locations.json");
 
 const MapContainer = (props) => {
